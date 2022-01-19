@@ -1,0 +1,35 @@
+{
+    "pages": [
+        "index/index",
+        "index/wave",
+        "index/market"
+    ],
+    "tabBar": {
+        "custom": true,
+        "color": "#7A7E83",
+        "selectedColor": "#3cc51f",
+        "borderStyle": "black",
+        "backgroundColor": "#ffffff",
+        "list": [
+            {
+                "pagePath": "index/index",
+                "iconPath": "image/icon_component.png",
+                "selectedIconPath": "image/icon_component_HL.png",
+                "text": "设备"
+            },
+            {
+                "pagePath": "index/market",
+                "iconPath": "image/icon_API.png",
+                "selectedIconPath": "image/icon_API_HL.png",
+                "text": "市场"
+            }
+        ]
+    },
+    "window": {
+        "backgroundTextStyle": "light",
+        "navigationBarBackgroundColor": "#fff",
+        "navigationBarTitleText": "WeChat",
+        "navigationBarTextStyle": "black"
+    },
+    "sitemapLocation": "sitemap.json"
+}
