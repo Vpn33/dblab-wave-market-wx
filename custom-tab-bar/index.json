@@ -1,3 +1,9 @@
 {
-  "component": true
+  "component": true,
+  "styleIsolation": "shared",
+  "usingComponents": {
+    "van-icon": "@vant/weapp/icon/index",
+    "van-tabbar": "@vant/weapp/tabbar/index",
+    "van-tabbar-item": "@vant/weapp/tabbar-item/index"
+  }
 }

@@ -1,0 +1,9 @@
+{
+    "component": true,
+    "styleIsolation": "shared",
+    "usingComponents": {
+        "van-icon": "@vant/weapp/icon/index",
+        "van-cell": "@vant/weapp/cell/index",
+        "van-cell-group": "@vant/weapp/cell-group/index"
+    }
+}

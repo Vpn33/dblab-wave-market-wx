@@ -1,0 +1,20 @@
+module.exports = {
+    stringify: function (arr) {
+        if (arr) {
+            return JSON.stringify(arr);
+        }
+        return "";
+    },
+    abs: function (arr) {
+        if (arr) {
+            return Math.abs(arr);
+        }
+        return arr;
+    },
+    toFixed: function (arr, rat) {
+        if (arr && typeof arr === 'number') {
+            return arr.toFixed(rat);
+        }
+        return arr;
+    }
+}

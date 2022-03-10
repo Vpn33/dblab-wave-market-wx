@@ -1,8 +1,9 @@
 {
     "pages": [
         "index/index",
-        "index/wave",
-        "index/market"
+        "index/market",
+        "index/my-wave-list",
+        "index/my-home"
     ],
     "tabBar": {
         "custom": true,
@@ -10,18 +11,16 @@
         "selectedColor": "#3cc51f",
         "borderStyle": "black",
         "backgroundColor": "#ffffff",
-        "list": [
-            {
-                "pagePath": "index/index",
-                "iconPath": "image/icon_component.png",
-                "selectedIconPath": "image/icon_component_HL.png",
-                "text": "设备"
+        "list": [{
+                "pagePath": "index/index"
             },
             {
-                "pagePath": "index/market",
-                "iconPath": "image/icon_API.png",
-                "selectedIconPath": "image/icon_API_HL.png",
-                "text": "市场"
+                "pagePath": "index/my-wave-list"
+            },
+            {
+                "pagePath": "index/market"
+            }, {
+                "pagePath": "index/my-home"
             }
         ]
     },
@@ -31,5 +30,11 @@
         "navigationBarTitleText": "WeChat",
         "navigationBarTextStyle": "black"
     },
-    "sitemapLocation": "sitemap.json"
+    "sitemapLocation": "sitemap.json",
+    "plugins": {
+        "echarts": {
+            "version": "2.1.0",
+            "provider": "wx1db9e5ab1149ea03"
+        }
+    }
 }

@@ -1,42 +1,77 @@
-<wxs module="utils">
-module.exports.max = function(n1, n2) {
-  return Math.max(n1, n2)
-}
-module.exports.len = function(arr) {
-  arr = arr || []
-  return arr.length
-}
+<!--index/wave.wxml-->
+<wxs module="fn">
+  module.exports = {
+    toText: function (arr) {
+      if (arr) {
+        return JSON.stringify(arr);
+      }
+      return "";
+    }
+
+  }
 </wxs>
-<button bindtap="openBluetoothAdapter">开始扫描</button>
-<button bindtap="stopBluetoothDevicesDiscovery">停止扫描</button>
-<button bindtap="closeBluetoothAdapter">结束流程</button>
-
-<view class="devices_summary">已发现 {{devices.length}} 个外围设备：</view>
-<scroll-view class="device_list" scroll-y scroll-with-animation>
-  <view wx:for="{{devices}}" wx:key="index"
-   data-device-id="{{item.deviceId}}"
-   data-name="{{item.name || item.localName}}"
-   bindtap="createBLEConnection" 
-   class="device_item"
-   hover-class="device_item_hover">
-    <view style="font-size: 16px; color: #333;">{{item.name}}</view>
-    <view style="font-size: 10px">信号强度: {{item.RSSI}}dBm ({{utils.max(0, item.RSSI + 100)}}%)</view>
-    <view style="font-size: 10px">UUID: {{item.deviceId}}</view>
-    <view style="font-size: 10px">Service数量: {{utils.len(item.advertisServiceUUIDs)}}</view>
-  </view>
-</scroll-view>
-
-<view class="connected_info" wx:if="{{connected}}">
-  <view>
-    <text>已连接到 {{name}}</text>
-    <view class="operation">
-    <button wx:if="{{canWrite}}" size="mini" bindtap="writeBLECharacteristicValue">写数据</button>
-    <button size="mini" bindtap="toggleDiyDglab">自定义波形</button>
-    <button size="mini" bindtap="closeBLEConnection">断开连接</button>
+<van-overlay show="{{ connState != '1' }}" z-index="9999">
+  <view class="wrapper">
+    <view class="content" wx:if="{{ connState == '-1' }}">
+      <view class="wrapper-title">
+        <text>蓝牙未授权</text>
+      </view>
+      <view class="wrapper-content">
+        <view bindtap="openSetting"><text>点击这里去授权</text></view>
+      </view>
+      <view class="wrapper-footer"><text>右上角小程序设置可更改授权</text></view>
+    </view>
+    <view class="content" wx:if="{{ connState == '0' }}">
+      <view class="wrapper-title">
+        <text>蓝牙连接中</text>
+      </view>
+      <view class="wrapper-content">
+        <view><text>正在搜索附近设备</text></view>
+        <view style="margin-left: 5px;">
+          <van-loading type="spinner" />
+        </view>
+      </view>
+      <view class="wrapper-footer"><text>短按产品任意一侧滚轮开机</text></view>
+    </view>
+    <view class="content" wx:if="{{ connState == '2' }}">
+      <view class="wrapper-title">
+        <text>蓝牙连接失败</text>
+      </view>
+      <view class="wrapper-content">
+        <view bindtap="getConnection"><text>点击重试</text></view>
+      </view>
+      <view class="wrapper-footer"><text>{{connStateMsg}}</text></view>
     </view>
   </view>
-  <view wx:for="{{chs}}" wx:key="index" style="font-size: 12px; margin-top: 10px;">
-    <view>特性UUID: {{item.uuid}}</view>
-    <view>特性值: {{item.value}}</view>
+</van-overlay>
+<view class="container">
+  <van-toast id="van-toast" />
+  <view class="page-body">
+    <van-dialog id="van-dialog" />
+    <view class="">
+      <text>状态：<text wx:if="{{connState == '0'}}">连接中</text><text wx:if="{{connState == '1'}}">已连接</text></text>
+    </view>
+    <view class="">
+      <text>电池电量：{{battery}} %</text>
+    </view>
+    <view>
+      <van-tabs active="{{ activeNames }}" bind:change="onChange" z-index="0">
+        <van-tab title="A通道" name="1">
+          <wave-player class="wave-player" channel="a" model:pw="{{pw.a || 0}}" aiPw="{{aiAp}}" bind:pwChange="pwChange" bind:sendWaveData="sendWaveData"></wave-player>
+        </van-tab>
+        <van-tab title="B通道" name="2">
+          <wave-player class="wave-player" channel="b" model:pw="{{pw.b || 0}}" aiPw="{{aiBp}}" bind:pwChange="pwChange" bind:sendWaveData="sendWaveData"></wave-player>
+        </van-tab>
+      </van-tabs>
+    </view>
+    <!-- <view>
+            <view class="section">
+                <text class="section__title">XYZ</text>
+                <textarea class="wave-song" maxlength="-1" bindconfirm="waveSongChange" cursor-spacing="10" value="{{fn.toText(mySong)}}" placeholder="[[1,9,4],[1,9,8],[1,9,12],[1,9,16],[1,9,18],[1,9,19],[1,9,20],[1,9,0],[1,9,0],[1,9,0]]" />
+            </view>
+            <view class="play-group">
+                <button type="primary" bindtap="playSong" size="mini"><text wx:if="{{!diyADg}}">Play</text> <text wx:if="{{diyADg}}">Stop</text> Song</button>
+            </view>
+        </view> -->
   </view>
 </view>

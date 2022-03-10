@@ -1,0 +1,21 @@
+{
+    "component": true,
+    "styleIsolation": "shared",
+    "usingComponents": {
+        "play-list": "/index/component/play-list",
+        "chart": "plugin://echarts/chart",
+        "van-button": "@vant/weapp/button/index",
+        "van-slider": "@vant/weapp/slider/index",
+        "van-row": "@vant/weapp/row/index",
+        "van-col": "@vant/weapp/col/index",
+        "van-icon": "@vant/weapp/icon/index",
+        "van-dialog": "@vant/weapp/dialog/index",
+        "van-switch": "@vant/weapp/switch/index",
+        "van-cell": "@vant/weapp/cell/index",
+        "van-cell-group": "@vant/weapp/cell-group/index",
+        "van-popup": "@vant/weapp/popup/index",
+        "van-picker": "@vant/weapp/picker/index",
+        "van-stepper": "@vant/weapp/stepper/index",
+        "van-field": "@vant/weapp/field/index"
+    }
+}

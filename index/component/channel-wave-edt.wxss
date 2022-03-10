@@ -1,0 +1,193 @@
+/* index/component/channel-wave-edt.wxss */
+
+.wave-stage {
+    box-sizing: border-box;
+    border: 1px solid #F9E49C;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 5px 0px;
+    min-width: 20rem;
+    height: 26rem;
+    margin-right: 5px;
+}
+
+.wave-stage:last-child {
+    color: #F9E49c;
+}
+
+.wave-info {
+    width: 100%;
+}
+
+.wave-channel {}
+
+.wave-channel.disabled .wave-stage:not(.add-stage) {
+    background-color: #848484;
+    opacity: 0.3;
+}
+
+.wave-channel .wave-channel-info {
+    padding: 0 1rem;
+}
+
+.wave-channel .channel-name {
+    display: inline-block;
+}
+
+.wave-channel .channel-enable {
+    display: inline-block;
+    left: calc(100% - (var(--switch-width, 2em) + 3rem));
+    position: relative;
+}
+
+.wave-channel-stage {
+    padding: 5px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+
+.wave-title {
+    height: 30px;
+    position: relative;
+}
+
+.wave-name {
+    width: 100%;
+    text-align: center;
+}
+
+.wave-name .van-cell {
+    padding: 0;
+}
+
+.wave-name .van-field__control {
+    width: 50%;
+    margin: 0px auto;
+    text-align: center;
+    color: blanchedalmond;
+    border-bottom: 1px #F9E49C solid;
+}
+
+.gradual {
+    width: 2rem;
+    height: 2rem;
+    background: linear-gradient(225deg, #F9E49C 50%, transparent 51%);
+    color: black;
+    text-align: right;
+    position: absolute;
+    left: calc(100% - 2rem);
+    border-top-right-radius: 5px;
+}
+
+.wave-stage .gradual {
+    top: -5px;
+    left: calc(100% - 2rem + 5px);
+}
+
+.wave-stage .wave-stage-add-btn {
+    height: 100%;
+    width: 100%;
+    font-size: 5rem;
+    text-align: center;
+}
+
+.hz-gradient-btn {
+    font-size: 1.5rem;
+}
+
+.hz-gradient {
+    transform: rotateY(180deg);
+}
+
+.player-item {
+    margin: 5px 0px;
+}
+
+.player-item .item-title {
+    margin-bottom: 5px;
+}
+
+.item-tools .van-button {
+    margin-left: 5px;
+}
+
+.player-item .metas {
+    width: 90%;
+    height: 8rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 1rem 1rem 0.5rem;
+    white-space: nowrap;
+}
+
+.player-item .meta-item {
+    width: 1.5rem;
+    height: 100%;
+    padding: 0px 2px;
+    display: inline-block;
+}
+
+.player-item .meta-item .meta-item-del {
+    height: 20%;
+    text-align: center;
+}
+
+.player-item .meta-item .meta-item-slider {
+    height: 80%;
+}
+
+.player-item .meta-item .meta-item-slider {
+    height: 80%;
+}
+
+.player-item .meta-item .van-slider {
+    left: 50%;
+}
+
+.last-col {
+    text-align: right;
+}
+
+.mini-btn.hz-add {
+    margin-left: 2px;
+}
+
+.player-pw-slider .van-slider {
+    margin-top: 10px;
+}
+
+.item-text {
+    width: 50%;
+    display: inline-block;
+}
+
+.item-tools {
+    width: 50%;
+    display: inline-block;
+    text-align: right;
+}
+
+.item-tools .van-button__text {
+    font-weight: bold;
+}
+
+.hz-range-silder {
+    padding: 5px 5px;
+}
+
+.stage-time-stepper .van-stepper__minus {
+    height: var(--button-mini-height, 22px);
+}
+
+.stage-time-stepper .van-stepper__input {
+    height: var(--button-mini-height, 22px);
+    padding: 0;
+}
+
+.stage-time-stepper .van-stepper__plus {
+    height: var(--button-mini-height, 22px);
+}

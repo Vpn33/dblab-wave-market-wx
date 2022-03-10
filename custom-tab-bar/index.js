@@ -1,30 +1,42 @@
 Component({
   data: {
-    selected: 0,
-    color: "#7A7E83",
-    selectedColor: "#3cc51f",
     list: [{
-      pagePath: "/index/index",
-      iconPath: "/image/icon_component.png",
-      selectedIconPath: "/image/icon_component_HL.png",
+      url: "/index/index",
+      iconPrefix: "iconfont",
+      icon: "dg-wolf",
       text: "设备"
     }, {
-      pagePath: "/index/market",
-      iconPath: "/image/icon_API.png",
-      selectedIconPath: "/image/icon_API_HL.png",
+      url: "/index/my-wave-list",
+      iconPrefix: "iconfont",
+      icon: "waves",
+      text: "我的波形"
+    }, {
+      url: "/index/market",
+      icon: "shopping-cart",
       text: "市场"
-    }]
+    }, {
+      url: "/index/my-home",
+      icon: "setting-o",
+      text: "设置"
+    }],
+    active: 0
   },
-  attached() {
-  },
+  attached() {},
   methods: {
-    switchTab(e) {
-      const data = e.currentTarget.dataset
-      const url = data.path
-      wx.switchTab({url})
+    onChange(event) {
       this.setData({
-        selected: data.index
-      })
+        active: event.detail
+      });
+      wx.switchTab({
+        url: this.data.list[event.detail].url
+      });
+    },
+
+    init() {
+      const page = getCurrentPages().pop();
+      this.setData({
+        active: this.data.list.findIndex(item => item.url === `/${page.route}`)
+      });
     }
   }
 })

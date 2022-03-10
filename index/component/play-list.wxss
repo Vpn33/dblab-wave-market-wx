@@ -1,0 +1,119 @@
+/* index/component/play-list.wxss */
+
+.player-list-item:last-child .van-cell {
+    border-bottom: 1px #F9E49C solid;
+}
+
+.player-list-item {
+    border-left: 1px #F9E49C solid;
+    border-right: 1px #F9E49C solid;
+    border-top: 1px #F9E49C solid;
+}
+
+.player-list-item.playing .van-cell {
+    background-color: rgb(99 99 99 / 70%);
+}
+
+.player-list-item:last-child .van-cell {
+    border-bottom: 1px #F9E49C solid;
+}
+
+
+.play-list .van-hairline--top-bottom:after {
+    border: none;
+}
+
+.play-list .van-cell:after {
+    border-bottom: none;
+}
+
+.player-list-tools {
+    text-align: right;
+}
+
+.play-cell-tools {
+    font-size: 1rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.play-cell-tools .play-cell-btn {
+    margin-left: 5px;
+}
+
+.play-cell-tools .van-icon {
+    display: inline-block;
+}
+
+.play-cell-btn,
+.play-cell-label {
+    color: blanchedalmond;
+}
+
+.play-cell-label {
+    width: 200%;
+}
+
+.play-cell-label-cont {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.play-cell-label-cont-line {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.play-cell .van-cell .van-cell__title {
+    font-size: 1.2rem;
+}
+
+.play-cell-title-cont {
+    display: flex;
+}
+
+.player-list-item {
+    border-left: 1px #F9E49C solid;
+    border-right: 1px #F9E49C solid;
+    border-top: 1px #F9E49C solid;
+}
+
+.player-list-item:last-child .van-cell {
+    border-bottom: 1px #F9E49C solid;
+}
+
+
+.play-list .van-hairline--top-bottom:after {
+    border: none;
+}
+
+.play-list .van-cell:after {
+    border-bottom: none;
+}
+
+.player-list-tools {
+    text-align: right;
+}
+
+.inv-stepper {
+    display: inline-block;
+}
+
+.play-item-line {
+    height: var(--stepper-input-height, 28px);
+}
+
+.play-item-line-elem {
+    /* display: inline-block; */
+    margin-right: 10px;
+}
+
+.player-list-empty .van-cell {
+    border: 1px solid #F9E49C;
+}
+
+.player-list-empty .van-cell::after {
+    border: none;
+}

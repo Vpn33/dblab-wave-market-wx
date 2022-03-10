@@ -1,0 +1,120 @@
+/* index/my-wave-list.wxss */
+.play-tools .van-dropdown-menu,
+.channel-wave-btn .van-button {
+    height: 25px;
+}
+
+.play-list {
+    /* 两层按钮=50px padding=1rem  两层按钮margin-top=10px tarbar = 50 底部变局 = 5px */
+    height: calc(100vh - (50px + 1rem + 10px + 50px + 5px));
+    overflow-y: auto;
+    margin-top: 5px;
+    margin-bottom: var(--tabbar-height, 50px);
+}
+
+.player-list-item {
+    border-left: 1px #F9E49C solid;
+    border-right: 1px #F9E49C solid;
+    border-top: 1px #F9E49C solid;
+}
+
+.player-list-item:last-child .van-cell {
+    border-bottom: 1px #F9E49C solid;
+}
+
+
+.play-list .van-hairline--top-bottom:after {
+    border: none;
+}
+
+.play-list .van-cell:after {
+    border-bottom: none;
+}
+
+.player-list-tools {
+    text-align: right;
+}
+
+.play-cell-tools {
+    font-size: 1rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.play-cell-tools .play-cell-btn {
+    margin-left: 5px;
+}
+
+.play-cell-tools .van-icon {
+    display: inline-block;
+}
+
+.play-cell-btn,
+.play-cell-label {
+    color: blanchedalmond;
+}
+
+.play-cell-label {
+    width: 200%;
+}
+
+.play-cell-label-cont {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.play-cell-label-cont-line {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.play-cell .van-cell .van-cell__title {
+    font-size: 1.2rem;
+}
+
+.play-cell-title-cont {
+    display: flex;
+}
+
+.play-cell-title-ver {
+    font-size: 12px;
+    line-height: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    vertical-align: bottom;
+    margin-left: 0.5rem;
+
+}
+
+.add-wave {
+    margin-top: 5px;
+}
+
+.channel-wave-btn {
+    display: flex;
+}
+
+.channel-wave-btn .channel-wave {
+    flex: 1;
+}
+
+.channel-wave-btn .channel-wave:first-child {
+    padding-right: 0.5rem;
+}
+
+.channel-wave-btn .channel-wave:last-child {
+    padding-left: 0.5rem;
+}
+
+.pop-content {
+    height: 20rem;
+    background-color: black;
+    overflow-y: auto;
+    margin-bottom: var(--tabbar-height, 50px);
+}
+
+.play-cell-double-channel {
+    font-weight: 1000;
+}

@@ -1,0 +1,16 @@
+{
+    "component": true,
+    "styleIsolation": "shared",
+    "usingComponents": {
+        "chart": "plugin://echarts/chart",
+        "van-button": "@vant/weapp/button/index",
+        "van-row": "@vant/weapp/row/index",
+        "van-col": "@vant/weapp/col/index",
+        "van-slider": "@vant/weapp/slider/index",
+        "van-icon": "@vant/weapp/icon/index",
+        "van-dialog": "@vant/weapp/dialog/index",
+        "van-field": "@vant/weapp/field/index",
+        "van-stepper": "@vant/weapp/stepper/index",
+        "van-switch": "@vant/weapp/switch/index"
+    }
+}

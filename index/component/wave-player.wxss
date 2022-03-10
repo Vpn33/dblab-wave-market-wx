@@ -1,0 +1,190 @@
+/* index/component/wave-player.wxss */
+.player-text {
+    font-size: 14px;
+    border: 1px solid;
+    border-radius: 4px;
+    padding: 2px 5px;
+    vertical-align: middle;
+}
+
+.play-wave-charts {
+    height: 10rem;
+}
+
+.play-wave-charts {
+    border: 1px #e5ff00 solid;
+    border-radius: 6px;
+}
+
+.play-wave-charts chart {
+    border-radius: 6px;
+}
+
+.player-item {
+    margin: 5px 0px;
+}
+
+.player-item-btns {
+    display: flex;
+    justify-content: center;
+}
+
+.player-item-btns-text {
+    line-height: 3rem;
+}
+
+.play-cell-tools {
+    font-size: 1rem;
+}
+
+.play-cell-tools .van-icon {
+    display: inline-block;
+}
+
+.player-pw-slider .van-slider {
+    margin-top: 10px;
+}
+
+.play-list {
+    margin-top: 5px;
+    margin-bottom: var(--tabbar-height, 50px);
+    /* height: 20rem;
+    overflow-y: auto; */
+}
+
+.play-list .play-item {}
+
+.player-list-item {
+    border-left: 1px #F9E49C solid;
+    border-right: 1px #F9E49C solid;
+    border-top: 1px #F9E49C solid;
+}
+.player-list-item:last-child .van-cell {
+    border-bottom: 1px #F9E49C solid;
+}
+
+
+.play-list .van-hairline--top-bottom:after {
+    border: none;
+}
+
+.play-list .van-cell:after {
+    border-bottom: none;
+}
+
+.player-list-tools {
+    text-align: right;
+}
+
+.inv-stepper {
+    display: inline-block;
+}
+
+.play-item-line {
+    height: var(--stepper-input-height, 28px);
+}
+
+.play-item-line-elem {
+    /* display: inline-block; */
+    margin-right: 10px;
+}
+
+.inv-stepper-switch .van-switch {
+    top: 20%;
+}
+
+.time-input .van-cell {
+    width: 2rem;
+    display: inline-block;
+    color: blanchedalmond;
+    height: var(--stepper-input-height, 28px);
+    padding: 1px;
+    top: 5px;
+}
+
+.time-input .van-field__control {
+    width: 100%;
+    background-color: #F9E49C;
+    color: black;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.not-show {
+    width: 34px;
+    height: 10px;
+    display: inline-block;
+}
+
+.inv-stepper-text {
+    display: inline-block;
+    vertical-align: middle;
+    height: 28px;
+}
+
+.btn-player button {
+    width: 3rem;
+    height: 3rem;
+    font-size: 2rem;
+}
+
+.btn-player-item .van-icon {
+    width: 3rem;
+    height: 3rem;
+    font-size: 2rem;
+    text-align: center;
+    top: 0.5rem;
+}
+
+.play-cell-tools {
+    font-size: 1rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.play-cell-tools .play-cell-btn {
+    margin-left: 5px;
+}
+
+.play-cell-tools .van-icon {
+    display: inline-block;
+}
+
+.play-cell-btn,
+.play-cell-label {
+    color: blanchedalmond;
+}
+
+.play-cell-label {
+    width: 200%;
+}
+
+.play-cell-label-cont {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.play-cell-label-cont-line {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.play-cell .van-cell .van-cell__title {
+    font-size: 1.2rem;
+}
+
+.play-cell-title-cont {
+    display: flex;
+}
+
+.play-cell-title-ver {
+    font-size: 12px;
+    line-height: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    vertical-align: bottom;
+    margin-left: 0.5rem;
+
+}

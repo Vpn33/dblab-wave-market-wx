@@ -1,0 +1,92 @@
+/* index/component/wave-editor.wxss */
+page {
+    background-color: black;
+}
+
+.wave-player {
+    position: fixed;
+    box-sizing: border-box;
+    border: 1px solid #F9E49C;
+    bottom: 1px;
+    border-radius: 5px;
+    width: 94%;
+    background-color: black;
+    left: 3%;
+    z-index: 9999;
+}
+
+.wave-player-channeles {
+    position: relative;
+    /* top: -2rem; */
+}
+
+.wave-player-channel {
+    margin: 5px;
+}
+
+.wave-player-channel .channel-pw {
+    display: flex;
+    height: var(--stepper-input-height, 28px);
+    line-height: var(--stepper-input-height, 28px);
+}
+
+.wave-player-channel .channel-pw-text {
+    width: 40%;
+}
+
+.wave-player-channel .channel-pw-btn {}
+
+.wave-player .player-btns {
+    display: flex;
+    width: 40%;
+    margin: auto;
+    padding-bottom: 5px;
+}
+
+.wave-player .play-wave-charts {
+    margin: 5px;
+    height: 6rem;
+    border: 1px #F9E49C solid;
+    border-radius: 5px;
+}
+
+.wave-player .player-btn .van-button--normal {
+    font-size: 2rem;
+    margin: 0 5px;
+}
+
+.wave-player .channel-name {
+    height: 2rem;
+    line-height: 2rem;
+    text-align: center;
+}
+.wave-channel-type{
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: center;
+}
+.wave-info {
+    /* border-bottom: 5px dotted #F9E49C;
+    margin-bottom: 1rem; */
+}
+
+.wave-info .van-field__control {
+    color: blanchedalmond;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.channel-stage {
+    margin-bottom: 1rem;
+    padding-top: 1rem;
+    border-top: 5px dotted #F9E49C;
+}
+
+.wave-editor-btns {
+    margin-bottom: 10rem;
+    display: flex;
+    justify-content: center;
+}
+.wave-editor-btns .player-btn{
+    margin: 0px 5px;
+}

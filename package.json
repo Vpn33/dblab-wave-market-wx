@@ -1,0 +1,23 @@
+{
+  "name": "dglab_wave_market",
+  "version": "1.0.0",
+  "description": "dblab-wave-market 's wx miniprogram",
+  "main": "app.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Vpn33/dblab-wave-market-wx.git"
+  },
+  "author": "vpn_33@126.com",
+  "license": "ISC",
+  "dependencies": {
+    "@vant/weapp": "^1.10.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.1"
+  }
+}
