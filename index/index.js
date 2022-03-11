@@ -22,7 +22,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-    isDebug: true, // 是否为测试模式
+    isDebug: false, // 是否为测试模式
     connState: '-1', // -1-未授权 0-未连接 1-已连接 2-连接中 2-连接失败
     connStateMsg: '', // 连接错误消息
     activeNames: '1',
