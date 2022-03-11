@@ -16,5 +16,17 @@ module.exports = {
             return arr.toFixed(rat);
         }
         return arr;
-    }
+    },
+    arrExists: function (arr, elem) {
+        if (arr && arr.length > 0) {
+            let res = false;
+            arr.find(function (v, i) {
+                if (v === elem) {
+                    res = true;
+                    return;
+                }
+            });
+            return res;
+        }
+    },
 }

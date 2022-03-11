@@ -42,6 +42,7 @@ view .van-radio__icon--checked {
 
 view .van-dialog__header {
     color: black;
+    padding: 1rem;
 }
 
 view .van-dialog__message {
@@ -81,4 +82,7 @@ view.container {
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
     background: #ededed;
+}
+.van-dialog__button button.van-button{
+    color: black!important;
 }

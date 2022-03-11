@@ -6,90 +6,41 @@ Component({
     properties: {
         playList: {
             type: Array,
-            value: [{
-                    id: "1",
-                    name: "潮汐",
-                    author: "XuDL",
-                    pubTime: "2021-01-11 12:23:11",
-                    downTime: "2021-01-11 12:23:11",
-                    a: {},
-                    b: {}
-                },
-                {
-                    id: "2",
-                    name: "呼吸",
-                    author: "XuDL",
+            value: [
+                // {
+                //     id: "1",
+                //     name: "潮汐",
+                //     author: "XuDL",
+                //     pubTime: "2021-01-11 12:23:11",
+                //     downTime: "2021-01-11 12:23:11",
+                //     a: {},
+                //     b: {}
+                // },
+                // {
+                //     id: "2",
+                //     name: "呼吸",
+                //     author: "XuDL",
 
-                },
-                {
-                    id: "3",
-                    name: "心跳节奏",
-                    author: "XuDL",
-                    pubTime: "2021-01-11 12:23:11",
-                    downTime: "2021-01-11 12:23:11",
-                },
-                {
-                    id: "4",
-                    name: "连击",
-                    author: "XuDL",
-                    pubTime: "2021-01-11 12:23:11",
-                    downTime: "2021-01-11 12:23:11",
-                },
-                {
-                    id: "1",
-                    name: "潮汐",
-                    author: "XuDL",
-                    pubTime: "2021-01-11 12:23:11",
-                    downTime: "2021-01-11 12:23:11",
-                },
-                {
-                    id: "2",
-                    name: "呼吸",
-                    author: "XuDL",
-
-                },
-                {
-                    id: "3",
-                    name: "心跳节奏",
-                    author: "XuDL",
-                    pubTime: "2021-01-11 12:23:11",
-                    downTime: "2021-01-11 12:23:11",
-                },
-                {
-                    id: "4",
-                    name: "连击",
-                    author: "XuDL",
-                    pubTime: "2021-01-11 12:23:11",
-                    downTime: "2021-01-11 12:23:11",
-                },
-                {
-                    id: "1",
-                    name: "潮汐",
-                    author: "XuDL",
-                    pubTime: "2021-01-11 12:23:11",
-                    downTime: "2021-01-11 12:23:11",
-                },
-                {
-                    id: "2",
-                    name: "呼吸",
-                    author: "XuDL",
-
-                },
-                {
-                    id: "3",
-                    name: "心跳节奏",
-                    author: "XuDL",
-                    pubTime: "2021-01-11 12:23:11",
-                    downTime: "2021-01-11 12:23:11",
-                },
-                {
-                    id: "4",
-                    name: "连击",
-                    author: "XuDL",
-                    pubTime: "2021-01-11 12:23:11",
-                    downTime: "2021-01-11 12:23:11",
-                }
+                // },
+                // {
+                //     id: "3",
+                //     name: "心跳节奏",
+                //     author: "XuDL",
+                //     pubTime: "2021-01-11 12:23:11",
+                //     downTime: "2021-01-11 12:23:11",
+                // },
+                // {
+                //     id: "4",
+                //     name: "连击",
+                //     author: "XuDL",
+                //     pubTime: "2021-01-11 12:23:11",
+                //     downTime: "2021-01-11 12:23:11",
+                // }
             ],
+        },
+        activeIdx: {
+            type: Number,
+            value: null
         }
     },
 
@@ -137,8 +88,8 @@ Component({
         toDown(e) {
             let idx = e.target.dataset['idx'];
             let list = this.data.playList || [];
-            // 已经是第一个不用动
-            if (idx <= 0) {
+            // 已经是最后一个不用动
+            if (idx == this.data.playList.length - 1) {
                 return;
             }
             let midx = idx++;

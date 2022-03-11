@@ -60,14 +60,14 @@
                 </view>
                 <van-row gutter="10" wx:if="{{s.hzType == 0}}">
                     <van-col span="5">
-                        <van-button icon="minus" class="mini-btn" type="default" size="mini" bindtap="subAp" bindlongpress="subLongAp" bindtouchend="endSubLongAp"></van-button>
+                        <van-button icon="minus" class="mini-btn" type="default" size="mini" bindtap="subAp" bindlongpress="subLongAp" bindtouchend="endSubLongAp" data-stage-idx="{{sIdx}}" ></van-button>
                     </van-col>
                     <van-col span="14">
                         <!-- 官网给定理想Frequency范围为10-1000 此时效果最好-->
                         <van-slider class="player-pw-slider" binddrag="onHzDrag" min="10" max="1000" value="{{s.hz}}" data-stage-idx="{{sIdx}}" />
                     </van-col>
                     <van-col span="5" class="last-col">
-                        <van-button icon="plus" class="mini-btn hz-add" type="default" size="mini" bindtap="addAp" bindlongpress="addLongAp" bindtouchend="endLongAp"></van-button>
+                        <van-button icon="plus" class="mini-btn hz-add" type="default" size="mini" bindtap="addAp" bindlongpress="addLongAp" bindtouchend="endLongAp" data-stage-idx="{{sIdx}}" ></van-button>
                     </van-col>
                 </van-row>
             </view>

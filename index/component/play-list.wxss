@@ -11,7 +11,7 @@
 }
 
 .player-list-item.playing .van-cell {
-    background-color: rgb(99 99 99 / 70%);
+    background-color: rgb(249 227 154 / 40%);
 }
 
 .player-list-item:last-child .van-cell {

@@ -2,6 +2,8 @@
 import wa from "../lib/wave-analyzer";
 import Toast from '@vant/weapp/toast/toast';
 import tools from '../lib/tools';
+import '../lib/lodash-init';
+import _ from "lodash";
 Page({
 
     /**
@@ -204,6 +206,44 @@ Page({
         let idx = e.target.dataset['idx'];
         let waveList = this.data.waveList;
         let wave = this.data.waveList[idx];
+        if (!wave.id) {
+            return;
+        }
+
+        let playList = this.data.playList;
+        if (!_.isEmpty(playList)) {
+            // 先删除播放列表中的
+            let delPath = [];
+            let delChannel = [];
+            for (let v in playList) {
+                let l = playList[v];
+                for (let w in l) {
+                    if (l[w].id === wave.id) {
+                        let p = v + '[' + w + ']';
+                        delPath.push(p);
+                        delChannel.push(v);
+                        break;
+                    }
+                }
+            }
+            if (!_.isEmpty(delPath)) {
+                // 删除播放列表
+                for (let i of delPath) {
+                    _.unset(playList, i);
+                }
+
+                // 写入文件
+                for (let j of delChannel) {
+                    let k = _.compact(playList[j]);
+                    playList[j] = k;
+                    wa.writePlayList(j, k);
+                }
+                this.setData({
+                    playList
+                });
+            }
+        }
+        // 再删除波形文件的
         console.log("del wave = ", wave);
         let res = await wa.deleteWave(wave.id);
         if (res) {
@@ -243,9 +283,20 @@ Page({
         let cha = e.target.dataset['channel'];
         let wave = this.data.waveList[idx];
         let list = this.data.playList[cha] || [];
+        let waveInf = _.pick(wave, ['id', 'name', 'author', 'ver', 'channelType']);
         // 不存在就添加
-        if (!this.existsWave(wave, list)) {
-            list.unshift(wave);
+        if (!this.existsWave(waveInf, list)) {
+            // 如果没有通道类型要设置一下
+            if (!waveInf.channelType) {
+                if (wave.a && wave.b) {
+                    // 双通道
+                    waveInf.channelType = '1';
+                } else if (wave.stages && wave.stages.length > 0) {
+                    // 单通道
+                    waveInf.channelType = '0';
+                }
+            }
+            list.unshift(waveInf);
             let data = {};
             data['playList.' + cha] = list;
             this.setData(data);

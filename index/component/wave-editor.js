@@ -5,6 +5,8 @@ import Toast from '@vant/weapp/toast/toast';
 import wa from "../../lib/wave-analyzer";
 import tools from '../../lib/tools';
 import moment from "moment";
+import '../../lib/lodash-init';
+import _ from "lodash";
 
 // 小节模板
 let stageTmp = {
@@ -90,50 +92,47 @@ Component({
         bChannelEnable: true, // B通道启用
         waveAChartsOpt: getHalfWaveChartsOpt(), // A通道波形图参数
         waveBChartsOpt: getHalfWaveChartsOpt(), // B通道波形图参数
-        channelType: '0', // 通道类型 0-单通道 1-双通道
         wave: {},
-        // {
-        //     id: '1111111111',
+        // wave:{
         //     name: "潮汐",
         //     author: "XuDL",
-        //     a: {
-        //         enabled: true,
-        //         stages: [{ // 小节数据
-        //             pw: 0, // 电源增量
-        //             hzType: 1, //0-固定 1-节内渐变 2-元间渐变 3-元内渐变
-        //             hz: [10, 100],
-        //             hzGradient: 0, // 渐变类型 0:高 -> 低 1:低 -> 高
-        //             times: 3,
-        //             metas: [{
-        //                 z: 0
-        //             }, {
-        //                 z: 5
-        //             }, {
-        //                 z: 10
-        //             }, {
-        //                 z: 15
-        //             }, {
-        //                 z: 20
-        //             }, {
-        //                 z: 25
-        //             }, {
-        //                 z: 30
-        //             }, {
-        //                 z: 29
-        //             }, {
-        //                 z: 28
-        //             }, {
-        //                 z: 27
-        //             }, {
-        //                 z: 26
-        //             }]
+        //     channelType: '0', // 通道类型 0-单通道 1-双通道
+        //     stages: [{ // 小节数据
+        //         pw: 0, // 电源增量
+        //         hzType: 1, //0-固定 1-节内渐变 2-元间渐变 3-元内渐变
+        //         hz: [10, 300],
+        //         hzGradient: 0, // 渐变类型 0:高 -> 低 1:低 -> 高
+        //         times: 1,
+        //         metas: [{
+        //             z: 0
+        //         }, {
+        //             z: 5
+        //         }, {
+        //             z: 10
+        //         }, {
+        //             z: 15
+        //         }, {
+        //             z: 20
+        //         }, {
+        //             z: 25
+        //         }, {
+        //             z: 30
+        //         }, {
+        //             z: 29
+        //         }, {
+        //             z: 28
+        //         }, {
+        //             z: 27
+        //         }, {
+        //             z: 26
         //         }]
-        //     }
+        //     }]
         // },
         // wave: {
         //     id:"12321asdasdsa",
         //     name: "持续",
         //     author: "XuDL",
+        //     channelType: '1', // 通道类型 0-单通道 1-双通道
         //     a: {
         //         enabled: true,
         //         stages: [{ // 小节数据
@@ -148,6 +147,8 @@ Component({
         //         }]
         //     }
         // }
+        showXyzImport: false, // 是否显示对话框
+        xyzImpData: "", // xyz格式的import数据
     },
     lifetimes: {
         attached: function () {
@@ -172,17 +173,17 @@ Component({
         }
     },
     observers: {
-        'wave': function (wave) {
-            let ena = '0';
-            if (wave) {
-                if (wave.a || wave.b) {
-                    ena = '1';
-                }
-            }
-            this.setData({
-                'channelType': ena
-            })
-        },
+        // 'wave': function (wave) {
+        //     let ena = '0';
+        //     if (wave) {
+        //         if (wave.a || wave.b) {
+        //             ena = '1';
+        //         }
+        //     }
+        //     this.setData({
+        //         'channelType': ena
+        //     })
+        // },
     },
     /**
      * 组件的方法列表
@@ -236,7 +237,7 @@ Component({
         },
         onChannelTypeChange(e) {
             this.setData({
-                'channelType': e.detail
+                'wave.channelType': e.detail
             });
         },
         onChartsInstance(e) {
@@ -259,7 +260,8 @@ Component({
         onChangeStageVal(e) {
             let cvl = e.detail;
             let data = {};
-            if (this.data.channelType === '0') {
+            let ct = this.data.wave.channelType || '0';
+            if ( ct === '0') {
                 data['wave.stages'] = cvl.channelWave.stages;
             } else {
                 data['wave.' + cvl.channelName + '.stages'] = cvl.channelWave.stages;
@@ -272,7 +274,17 @@ Component({
                 Toast.fail("波形名称不能为空");
                 return;
             }
-            if (this.data.channelType === '0') {
+            // 如果没有通道类型要设置一下
+            if (!wave.channelType) {
+                if (wave.a && wave.b) {
+                    // 双通道
+                    wave.channelType = '1';
+                } else if (wave.stages && wave.stages.length > 0) {
+                    // 单通道
+                    wave.channelType = '0';
+                }
+            }
+            if (wave.channelType === '0') {
                 if (tools.isEmpty(wave.stages)) {
                     Toast.fail("至少添加一个小节");
                     return;
@@ -291,7 +303,8 @@ Component({
             if (wave.b && (wave.b.enabled === false || tools.isEmpty(wave.b.stages))) {
                 delete wave.b;
             }
-            if (this.data.channelType === '1') {
+             
+            if (wave.channelType === '1') {
                 if (wave.a && wave.b) {
                     let st = [];
                     st = st.concat(wave.a.stages || [], wave.b.stages || []);
@@ -334,7 +347,6 @@ Component({
 
 
             // console.log("wave = ", JSON.stringify(this.data.wave, null, 4));
-        }
-
+        },        
     }
 })

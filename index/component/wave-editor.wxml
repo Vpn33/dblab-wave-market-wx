@@ -2,7 +2,6 @@
 <wxs src="../../lib/tools.wxs" module="tools"></wxs>
 
 <view class="container">
-    <van-toast id="van-toast" />
     <view class="page-body">
         <!-- <view class="wave-tips">
             <van-button plain bindtap="createWave">创建</van-button>
@@ -14,17 +13,17 @@
         </view>
         <view>
             <view class="wave-channel-type">
-                <van-radio-group value="{{ channelType }}" bind:change="onChannelTypeChange" direction="horizontal">
+                <van-radio-group value="{{ wave.channelType || '0'}}" bind:change="onChannelTypeChange" direction="horizontal">
                     <van-radio name="0">单通道</van-radio>
                     <van-radio name="1">双通道</van-radio>
                 </van-radio-group>
             </view>
-            <view wx:if="{{channelType === '0'}}">
+            <view wx:if="{{(wave.channelType || '0' ) === '0'}}">
                 <view class="channel-stage">
                     <channel-wave-edt no-channel="true" channelWave="{{wave}}" bind:change="onChangeStageVal"></channel-wave-edt>
                 </view>
             </view>
-            <view wx:if="{{channelType === '1'}}">
+            <view wx:if="{{(wave.channelType || '0') === '1'}}">
                 <view class="channel-stage">
                     <channel-wave-edt channel-name="a" channelWave="{{wave.a}}" bind:change="onChangeStageVal"></channel-wave-edt>
                 </view>
@@ -35,6 +34,7 @@
         </view>
         <view class="wave-editor-btns">
             <view>
+                <!-- <van-button type="primary" class="player-btn" bindtap="showImport">导入</van-button> -->
                 <van-button type="primary" class="player-btn" bindtap="saveWave">保存</van-button>
                 <van-button type="primary" class="player-btn" bindtap="saveWaveAs">另存为</van-button>
             </view>
@@ -91,4 +91,10 @@
             </view>
         </view>
     </view>
+    <!-- <van-dialog zIndex="2"use-slot title="导入[xyz]格式波形数据" show="{{ showXyzImport }}" show-cancel-button bind:confirm="confirmXyzImp" bind:close="onXyzImpClose">
+        <view class="container import-xyz-content">
+            <van-field input-class="wave-song h-scorller" value="{{tools.stringify(xyzImpData)}}" bind:blur="xyzImpChange" maxlength="-1" type="textarea" placeholder="[[1,9,4],[1,9,8],[1,9,12],[1,9,16],[1,9,18],[1,9,19],[1,9,20],[1,9,0],[1,9,0],[1,9,0]]" autosize="{{false}}" border="{{false}}" />
+        </view>
+    </van-dialog> -->
+    <van-toast id="van-toast" />
 </view>

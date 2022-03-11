@@ -90,3 +90,11 @@ page {
 .wave-editor-btns .player-btn{
     margin: 0px 5px;
 }
+.import-xyz-content{
+    height: 20rem;
+}
+.import-xyz-content .van-field__control {
+    height: 20rem;
+    color: blanchedalmond;
+    font-size: 1.2rem;
+}

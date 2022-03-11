@@ -3,7 +3,8 @@
         "index/index",
         "index/market",
         "index/my-wave-list",
-        "index/my-home"
+        "index/my-home",
+        "index/component/wave-editor"
     ],
     "tabBar": {
         "custom": true,

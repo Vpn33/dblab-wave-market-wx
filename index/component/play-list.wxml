@@ -1,23 +1,24 @@
 <!--index/component/play-list.wxml-->
+<wxs src="../../lib/tools.wxs" module="tools"></wxs>
 <view class="player-list">
     <view class="player-list-empty " wx:if="{{!playList || playList.length <= 0}}">
         <van-cell class="play-cell" title="请添加波形">
         </van-cell>
     </view>
-    <view class="player-list-item {{item.status?item.status:''}}" wx:for="{{playList || []}}" wx:for-index="sIdx" wx:key="sIdx" bindtap="clickItem">
-        <van-cell class="play-cell" use-label-slot="true" data-idx="{{sIdx}}" >
-            <view class="play-cell-title" slot="title" data-idx="{{sIdx}}" >
-                <view class="play-cell-title" slot="title" data-idx="{{sIdx}}" >
-                    <view class="play-cell-title-cont" data-idx="{{sIdx}}" >
-                        <text class="play-cell-title-name" data-idx="{{sIdx}}" >{{ item.name}}</text>
-                        <view class="play-cell-title-ver" data-idx="{{sIdx}}" >
+    <view class="player-list-item {{activeIdx === sIdx?'playing':''}}" wx:for="{{playList || []}}" wx:for-index="sIdx" wx:key="sIdx" bindtap="clickItem">
+        <van-cell class="play-cell" use-label-slot="true" data-idx="{{sIdx}}">
+            <view class="play-cell-title" slot="title" data-idx="{{sIdx}}">
+                <view class="play-cell-title" slot="title" data-idx="{{sIdx}}">
+                    <view class="play-cell-title-cont" data-idx="{{sIdx}}">
+                        <text class="play-cell-title-name" data-idx="{{sIdx}}">{{ item.name}}</text>
+                        <view class="play-cell-title-ver" data-idx="{{sIdx}}">
                             <text> {{item.author}} {{ item.ver || '1.0'}}</text>
-                            <text class="play-cell-double-channel" wx:if="{{item.a &&item.b}}">双通道</text>
+                            <text class="play-cell-double-channel" wx:if="{{(item.a && item.b) || item.dbChannel}}">双通道</text>
                         </view>
                     </view>
                 </view>
             </view>
-            <view class="play-cell-tools" data-idx="{{sIdx}}" >
+            <view class="play-cell-tools" data-idx="{{sIdx}}">
                 <van-icon class="play-cell-btn" name="back-top" catch:tap="toTop" data-idx="{{sIdx}}" />
                 <van-icon class="play-cell-btn" name="arrow-up" catch:tap="toUp" data-idx="{{sIdx}}" />
                 <van-icon class="play-cell-btn" name="arrow-down" catch:tap="toDown" data-idx="{{sIdx}}" />

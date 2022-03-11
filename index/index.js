@@ -404,6 +404,7 @@ Page({
   },
 
   closeBLEConnection() {
+    // 关闭蓝牙连接
     if (this.diyADg) clearInterval(this.diyADg);
     if (this.diyBDg) clearInterval(this.diyBDg);
     // 设置电源=0
@@ -415,9 +416,11 @@ Page({
     };
     this.setData(data);
     this.sendAbPwChange2BLE();
-    wx.closeBLEConnection({
-      deviceId: this.data.device.deviceId
-    })
+    if (this.data.device.deviceId) {
+      wx.closeBLEConnection({
+        deviceId: this.data.device.deviceId
+      });
+    }
   },
 
   getAbPw(str) {
@@ -496,6 +499,9 @@ Page({
     let buf = this.getSendBuffer(abPw);
     console.log("set power a = %s b = %s", this.data.pw.a, this.data.pw.b);
     // 发送数据
+    if (!this.data.device || !this.data.device.deviceId) {
+      return;
+    }
     wx.writeBLECharacteristicValue({
       deviceId: this.data.device.deviceId,
       serviceId: abServiceId,
@@ -648,6 +654,9 @@ Page({
       chid = bChId;
     }
     console.log("sendWaveData=", e);
+    if (!this.data.device || !this.data.device.deviceId) {
+      return;
+    }
     wx.writeBLECharacteristicValue({
       deviceId: this.data.device.deviceId,
       serviceId: abServiceId,

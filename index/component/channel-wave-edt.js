@@ -181,6 +181,48 @@ Component({
             );
             this.channgeChannelWave();
         },
+        addAp(e) {
+            let idx = e.target.dataset['stageIdx'];
+            let hz = this.properties.channelWave.stages[idx].hz;
+            let ap = hz + 1;
+            if (ap > 100) ap = 100;
+            let data = {};
+            data['channelWave.stages[' + idx + '].hz'] = ap;
+            this.setData(
+                data
+            );
+            this.channgeChannelWave();
+        },
+        addLongAp() {
+            this.addLongApInv = setInterval(() => {
+                this.addAp();
+            }, 100);
+        },
+        endLongAp() {
+            clearInterval(this.addLongApInv);
+            this.addLongApInv = null;
+        },
+        subAp(e) {
+            let idx = e.target.dataset['stageIdx'];
+            let hz = this.properties.channelWave.stages[idx].hz;
+            let ap = hz - 1;
+            if (ap < 10) ap = 10;
+            let data = {};
+            data['channelWave.stages[' + idx + '].hz'] = ap;
+            this.setData(
+                data
+            );
+            this.channgeChannelWave();
+        },
+        subLongAp() {
+            this.subLongApInv = setInterval(() => {
+                this.subAp();
+            }, 100);
+        },
+        endSubLongAp() {
+            clearInterval(this.subLongApInv);
+            this.subLongApInv = null;
+        },
         hzGradientChange(e) {
             // 渐变类型
             let idx = e.target.dataset['stageIdx'];

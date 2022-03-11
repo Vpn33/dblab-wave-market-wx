@@ -3,20 +3,16 @@ import Dialog from '@vant/weapp/dialog/dialog';
 import wa from "../../lib/wave-analyzer";
 import Toast from '@vant/weapp/toast/toast';
 import InvWorker from '../../lib/inv-worker';
+import cons from '../../lib/consts';
+import '../../lib/lodash-init';
+import _ from "lodash";
 
-function ab2hex(buffer) {
-    var hexArr = Array.prototype.map.call(new Uint8Array(buffer), function (bit) {
-        return ('00' + bit.toString(16)).slice(-2);
-    });
-    return hexArr.join('');
+function getHalfWaveChartsOpt() {
+    let tmp = cons.getWaveChartsOpt();
+    tmp.legend.data[0].textStyle.fontSize = 9;
+    tmp.legend.data[1].textStyle.fontSize = 9;
+    return tmp;
 }
-var pwServiceId = "955A180A-0FE2-F5AA-A094-84B8D4F3E8AD",
-    abServiceId = "955A180B-0FE2-F5AA-A094-84B8D4F3E8AD",
-    abPWChId = "955A1504-0FE2-F5AA-A094-84B8D4F3E8AD",
-    pwChId = "955A1500-0FE2-F5AA-A094-84B8D4F3E8AD",
-    aChId = "955A1505-0FE2-F5AA-A094-84B8D4F3E8AD",
-    bChId = "955A1506-0FE2-F5AA-A094-84B8D4F3E8AD";
-
 Component({
     /**
      * 组件的属性列表
@@ -52,99 +48,7 @@ Component({
      * 组件的初始数据
      */
     data: {
-        waveChartsOpt: {
-            color: ['#e5ff00'],
-            grid: {
-                width: "90%",
-                height: "80%",
-                left: "center",
-                top: "15%",
-                right: "center",
-            },
-            legend: {
-                show: true,
-                data: [{
-                    name: "波形图像",
-                    textStyle: {
-                        color: "#fcfcfc"
-                    }
-                }, {
-                    name: "电源强度",
-                    textStyle: {
-                        color: "#fcfcfc"
-                    }
-                }]
-            },
-            xAxis: {
-                show: true,
-                type: 'time',
-                axisLine: { //轴线
-                    show: true,
-                    lineStyle: {
-                        color: '#e5ff00'
-                    }
-                },
-                axisTick: { // 刻度
-                    show: false
-                },
-                axisLabel: { // 刻度标签
-                    interval: 0
-                },
-            },
-            yAxis: [{
-                show: true,
-                max: 31,
-                type: 'value',
-                axisLine: {
-                    show: true,
-                    lineStyle: {
-                        color: '#e5ff00'
-                    }
-                },
-                axisTick: {
-                    show: false
-                },
-                splitLine: {
-                    show: false
-                },
-                // minInterval: 0,
-                // maxInterval: 31,
-                axisLabel: {
-                    show: false
-                },
-            }, {
-                type: 'value',
-                min: 0, //Y轴最小值
-                max: 2047, //Y轴最大值
-                axisTick: {
-                    show: false
-                },
-                splitLine: {
-                    show: false
-                },
-                axisLabel: {
-                    show: false
-                },
-            }],
-            series: [{
-                name: '波形图像',
-                data: [],
-                type: 'bar',
-                barWidth: 2
-            }, {
-                name: '电源强度',
-                data: [],
-                type: 'line',
-                yAxisIndex: 1,
-                itemStyle: {
-                    normal: {
-                        color: '#339bfb' // 折线的颜色
-                    }
-                },
-            }],
-
-            animation: false
-        },
+        waveChartsOpt: getHalfWaveChartsOpt(), // 波形图参数
         showPlayType: false, // 0: 列表循环 1:列表顺序 2:列表随机 3:单曲循环
         playList: { // 播放列表都AB的包含 因为是一起存储的 通过channel区分 当前使用的那个
             a: [
@@ -215,6 +119,19 @@ Component({
         },
         playingIdx: 0, // 正在播放的波形索引
         invWorker: new InvWorker(), // 发送数据计时器
+        dbChannel: true, // 双通道波形优先
+        playingTempInfo: { // 正在播放波形的临时变量
+            a: { // a通道
+                dataIdx: null, // 下标
+                wavePrevTime: null, // 上次时间
+                waveY: null, // y
+            },
+            b: {
+                dataIdx: null,
+                wavePrevTime: null,
+                waveY: null,
+            },
+        } //
     },
     pageLifetimes: {
         show: function () {
@@ -247,14 +164,34 @@ Component({
         },
         showPwHelp() {
             Dialog.alert({
+                context: this,
                 message: '更精细的电源强度。不同于DG-LAB的APP中的电源强度，APP中的强度被封印成了7的倍数, 由于解开了封印，所以十分灵敏，如使用滑块操作请小心调节。',
             });
         },
         showAiPwHelp() {
             Dialog.alert({
+                context: this,
                 message: '开启后会自动记录在播放某个波形时的电源强度，下次播放时，如果电源强度大于记录的强度，就会自动减小到已记录的强度，当波形结束播放后，电源强度恢复。' +
                     '更智能的避免波形切换时带来的冲击感。(例如：A波-可承受电源130强度 B波-可承受电源100强度 如果按照APP的功能，从 A -> B 时因为强度没变，就会产生强烈的刺痛感，需要手动调节强度,' +
                     '开启本功能后，就会主键避免这种问题，越使用就越精确)',
+            });
+        },
+        showInvHelp() {
+            Dialog.alert({
+                context: this,
+                message: '固定通道输出的时间，一旦达到设置的时间，通道会自动停止播放，并且设置电源强度为0',
+            });
+        },
+        showRdmInvHelp() {
+            Dialog.alert({
+                context: this,
+                message: '根据随机参数对通道播放时常和间隔进行控制。',
+            });
+        },
+        showDbChannelHelp() {
+            Dialog.alert({
+                context: this,
+                message: '开启后，如果播放的波形是双通道的，另一通道被占用的情况下，将会自动停止另一通道的播放，从而播放当前双通道的波形。如果不开启，只会播放双通道中当前通道的波形',
             });
         },
         showPlayTypePop() {
@@ -308,42 +245,102 @@ Component({
                 })
             }
         },
-        writeCharts(y, z, time) {
-            let dt = time;
-            if (this.wavePrevTime) {
-                dt = this.wavePrevTime + this.waveY;
-            }
+        // writeCharts(y, z, time) {
+        //     let dt = time;
+        //     if (this.wavePrevTime) {
+        //         dt = this.wavePrevTime + this.waveY;
+        //     }
+        //     if (!this.waveChartsData) {
+        //         this.waveChartsData = [];
+        //     }
+        //     if (!this.pwChartsData) {
+        //         this.pwChartsData = [];
+        //     }
+        //     // 电源强度
+        //     this.pwChartsData.push([dt, this.data.pw]);
+
+        //     if (this.pwChartsData.length > 20) {
+        //         this.pwChartsData.shift();
+        //     }
+
+        //     // 波形数据
+        //     this.waveChartsData.push([dt, z]);
+        //     if (this.waveChartsData.length > 20) {
+        //         this.waveChartsData.shift();
+        //     }
+
+        //     // else if(this.waveChartsData.length == 1){
+        //     //     this.waveChartsData.unshift([time - 1, 0]);
+        //     //     this.waveChartsData.unshift([time - 1023, 0]);
+        //     //     let emStart = this.waveChartsData.length;
+        //     //     for(emStart;emStart < 20;emStart ++){
+        //     //         this.waveChartsData.unshift([time - (100 * emStart), 0]);
+        //     //     }
+        //     // }
+        //     console.log("charts = ", this.waveChartsData[this.waveChartsData.length - 1], "y", y);
+        //     this.setCharts(this.waveChartsData, this.pwChartsData);
+        //     this.wavePrevTime = time;
+        //     this.waveY = y;
+        // },
+        writeCharts(song, time) {
+            // (x + y) / 100 = 波形数据在100毫秒内会创建几次脉冲
+            // let pulseCnt = parseInt((song.x || 0) + (song.y) / 100);
             if (!this.waveChartsData) {
                 this.waveChartsData = [];
             }
             if (!this.pwChartsData) {
                 this.pwChartsData = [];
             }
-            // 电源强度
-            this.pwChartsData.push([dt, this.data.pw]);
-            if (this.pwChartsData.length > 20) {
-                this.pwChartsData.shift();
+            // 计算0.1秒 100毫秒内一共有多少次脉冲图像
+            let pulseCnt = 0;
+            for (let t = 0; t < 100; t++) {
+                let dt = time + t;
+                if (0 == (t % song.y)) {
+                    for (let i = 0; i < song.x; i++) {
+                        dt = dt + i;
+                        // 电源强度
+                        this.pwChartsData.push([dt, this.data.pw]);
+                        if (this.pwChartsData.length > 200) {
+                            this.pwChartsData.shift();
+                        }
+                        // 波形数据
+                        this.waveChartsData.push([dt, song.z]);
+                        if (this.waveChartsData.length > 200) {
+                            this.waveChartsData.shift();
+                        }
+                    }
+                    pulseCnt++;
+                }
             }
-
-            // 波形数据
-            this.waveChartsData.push([dt, z]);
-            if (this.waveChartsData.length > 20) {
-                this.waveChartsData.shift();
-            }
-
-            // else if(this.waveChartsData.length == 1){
-            //     this.waveChartsData.unshift([time - 1, 0]);
-            //     this.waveChartsData.unshift([time - 1023, 0]);
-            //     let emStart = this.waveChartsData.length;
-            //     for(emStart;emStart < 20;emStart ++){
-            //         this.waveChartsData.unshift([time - (100 * emStart), 0]);
-            //     }
-            // }
-
             this.setCharts(this.waveChartsData, this.pwChartsData);
-            this.wavePrevTime = time;
-            this.waveY = y;
         },
+        // writeCharts(hz, z, time) {
+        //     let dt = 0;
+        //     if (this.waveY != null) {
+        //         dt = this.waveY + hz;
+        //     }
+        //     if (!this.waveChartsData) {
+        //         this.waveChartsData = [];
+        //     }
+        //     if (!this.pwChartsData) {
+        //         this.pwChartsData = [];
+        //     }
+        //     // 电源强度
+        //     this.pwChartsData.push([dt, this.data.pw]);
+
+        //     if (this.pwChartsData.length > 30) {
+        //         this.pwChartsData.shift();
+        //     }
+
+        //     // 波形数据
+        //     this.waveChartsData.push([dt, z]);
+        //     if (this.waveChartsData.length > 30) {
+        //         this.waveChartsData.shift();
+        //     }
+        //     this.waveY = dt;
+        //     console.log("charts  z = ", z, "hz = ", hz, "dt = ", dt);
+        //     this.setCharts(this.waveChartsData, this.pwChartsData);
+        // },
         subAp() {
             let ap = this.data.pw - 1;
             if (ap < 0) ap = 0;
@@ -403,19 +400,11 @@ Component({
             wa.writePlayList(this.data.channel, this.data.playList);
         },
         onPlayWaveClick(e) {
-            console.log("onPlayWaveClick", e);
+            // console.log("onPlayWaveClick", e);
             let tar = e.detail;
             let idx = tar.index;
-            let list = this.data.playList || [];
-            let wave = list[idx];
-            if (!wave) {
-                wave = tar.wave;
-                // 设置播放状态
-                wave.status = 'playing';
-            }
             let data = {};
-            data['playList'] = list;
-            data.playingIdx = idx;
+            data['playingIdx'] = idx;
             this.setData(data);
         },
         onInstance({
@@ -434,16 +423,21 @@ Component({
                 });
                 return;
             }
-            if (!(this.data.playList[cha] && this.data.playList[cha].length > 0)) {
+            if (!(this.data.playList && this.data.playList.length > 0)) {
                 Toast.fail("请添加波形");
                 return;
             }
             let idx = this.data.playingIdx;
-            let wave = this.data.playList[cha][idx];
-            let data = wa.analyzeWave(wave);
-            if (!data) {
+            let wave = this.data.playList[idx];
+            let data = {};
+            let waveData = wa.analyzeWave(wave);
+            if (!waveData) {
                 Toast.fail("波形解析失败，请编辑后重新尝试或更换波形");
                 return;
+            }
+            // 如果是数组 就是单通道的 如果是{} 就是双通道的
+            if (_.isArray(waveData)) {
+                data[cha] = waveData;
             }
             console.log("wave = ", wave.name, "data = ", data);
             let songChannel = data[cha];
@@ -455,7 +449,7 @@ Component({
                 }
                 let song = songChannel[dataIdx];
                 if (song) {
-                    that.writeCharts(song.y || 0, song.z || 0, new Date().getTime());
+                    that.writeCharts(song, new Date().getTime());
                     that.triggerEvent("sendWaveData", {
                         channel: cha,
                         song
