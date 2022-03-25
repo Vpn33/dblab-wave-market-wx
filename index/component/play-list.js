@@ -41,6 +41,10 @@ Component({
         activeIdx: {
             type: Number,
             value: null
+        },
+        type: { // 默认是波形列表  power是电源方案列表
+            type: String,
+            value: null
         }
     },
 
@@ -104,9 +108,15 @@ Component({
         },
         toEditor: function (e) {
             let idx = e.target.dataset['idx'];
-            wx.navigateTo({
-                url: 'component/wave-editor?waveId=' + this.data.playList[idx].id,
-            })
+            if (this.data.type === 'power') {
+                wx.navigateTo({
+                    url: 'component/power-editor?powerId=' + this.data.playList[idx].id
+                });
+            } else {
+                wx.navigateTo({
+                    url: 'component/wave-editor?waveId=' + this.data.playList[idx].id,
+                });
+            }
         },
         toDelete(e) {
             let idx = e.target.dataset['idx'];
@@ -119,17 +129,16 @@ Component({
             this.triggerEvent('change', list);
         },
         clickItem(e) {
-            console.log("clickItem");
             let idx = e.target.dataset['idx'];
             let list = this.data.playList || [];
-            let wave = list[idx];
-            if (wave) {
-                let data = {
+            let data = list[idx];
+            if (data) {
+                let p = {
                     index: idx,
-                    channel: this.data.channel,
-                    wave
+                    data
                 };
-                this.triggerEvent('waveclick', data);
+                this.triggerEvent('clickItem', p);
+                console.log("clickItem", p);
             }
         }
     }

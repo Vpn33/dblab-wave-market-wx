@@ -30,7 +30,7 @@
             "disablePlugins": [],
             "outputPath": ""
         },
-        "useIsolateContext": false,
+        "useIsolateContext": true,
         "userConfirmedBundleSwitch": false,
         "packNpmManually": false,
         "packNpmRelationList": [],
@@ -43,7 +43,7 @@
     },
     "compileType": "miniprogram",
     "libVersion": "2.21.3",
-    "appid": "wx02e0b8fea326c7bd",
+    "appid": "wxb2311caf821ebd99",
     "projectname": "my-db-lab",
     "isGameTourist": false,
     "condition": {

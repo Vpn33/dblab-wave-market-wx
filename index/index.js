@@ -1,6 +1,7 @@
 // index/wave.js
 import Dialog from '@vant/weapp/dialog/dialog';
 import tools from '../lib/tools';
+import Device from '../lib/device';
 
 function ab2hex(buffer) {
   var hexArr = Array.prototype.map.call(new Uint8Array(buffer), function (bit) {
@@ -22,12 +23,10 @@ Page({
    * 页面的初始数据
    */
   data: {
-    isDebug: false, // 是否为测试模式
+    isDebug: true, // 是否为测试模式
     connState: '-1', // -1-未授权 0-未连接 1-已连接 2-连接中 2-连接失败
     connStateMsg: '', // 连接错误消息
     activeNames: '1',
-    aiAp: true,
-    aiBp: true,
     device: null,
     // mySong: [
     //     [1, 9, 4],
@@ -69,6 +68,9 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    let d = Device;
+    getApp().blDevice = d;
+    this._device = d;
     // wx.getSystemInfo({
     //   success(res) {
     //     console.log(res)
@@ -97,6 +99,11 @@ Page({
    */
   onReady: function () {
 
+    // d.setPw({
+    //   a: 2,
+    //   b: 0
+    // });
+    // console.log(d.getPw());
   },
 
   /**
@@ -110,8 +117,9 @@ Page({
    * 生命周期函数--监听页面卸载
    */
   onUnload: function () {
-    this.closeBLEConnection();
-    this.closeBluetoothAdapter();
+    if (this._device) {
+      this._device.disConnection();
+    }
   },
   /**
    * 页面相关事件处理函数--监听用户下拉动作
@@ -174,148 +182,45 @@ Page({
     if (!res) {
       return;
     }
+    // 如果状态是已连接就跳过
+    if (this.data.connState == '1') {
+      // 停止搜索
+      this._device.stopDiscovery();
+      this.setData({
+        'connState': '1'
+      })
+      return;
+    }
+    let msg = null;
     // 如果正在搜索就跳过
-    if (this._discoveryStarted) {
-      return
+    if (this._device.isDiscoveryStarted()) {
+      return;
     }
     // 改变蓝牙状态为正在连接
     this.setData({
       'connState': '0'
     });
-    // 打开蓝牙适配器
-    wx.openBluetoothAdapter({
-      success: (res) => {
-        // 搜索蓝牙设备
-        this.startBluetoothDevicesDiscovery();
-        // 30秒后关闭搜索
-        let that = this;
-        setTimeout(() => {
-          that.stopBluetoothDevicesDiscovery();
-          // 如果没有设备 说明没有找到
-          if (!that.device) {
-            // 改变蓝牙状态为搜索结束 没有发现设备
-            this.setData({
-              'connState': '2',
-              'connStateMsg': '没有发现设备'
-            });
-          }
-        }, 30000);
-      },
-      fail: (res) => {
-        let msg = this.getBluetoothAdapterMsg(res);
-        if (!msg) {
-          msg = res.errMsg;
-        }
-        // 如果是设备不可用 可能是被系统禁止了 注册一个状态监听器 一旦恢复 可以继续搜索
-        if (res.errCode === 10001) {
-          wx.onBluetoothAdapterStateChange(function (res) {
-            // 设备可用
-            if (res.available) {
-              // 搜索蓝牙设备
-              this.startBluetoothDevicesDiscovery()
-            }
-          })
-        }
-        // 设置错误消息
-        if (msg) {
-          // 连接失败
-          this.setData({
-            'connState': '2',
-            'connStateMsg': msg
-          })
-        }
-      }
-    })
-  },
-  closeBluetoothAdapter() {
-    wx.closeBluetoothAdapter();
-    this._discoveryStarted = false;
-    this.setData({
-      'connState': '-1'
-    });
-  },
-  getBluetoothAdapterMsg(res) {
-    // 解析蓝牙适配器消息
-    let msg = null;
-    switch (res.errCode) {
-      case 10000:
-        msg = '未初始化蓝牙适配器';
-        break;
-      case 10001:
-        msg = '当前蓝牙适配器不可用';
-        break;
-      case 10002:
-        msg = '没有找到指定设备';
-        break;
-      case 10003:
-        msg = '连接失败';
-        break;
-      case 10004:
-        msg = '没有找到指定服务';
-        break;
-      case 10005:
-        msg = '没有找到指定特征';
-        break;
-      case 10006:
-        msg = '当前连接已断开';
-        break;
-      case 10007:
-        msg = '当前特征不支持此操作';
-        break;
-      case 10008: // 其余所有系统上报的异常
-        msg = '蓝牙设备异常';
-        break;
-      case 10009: // Android 系统特有，系统版本低于 4.3 不支持 BLE
-        msg = '您的系统版本过低，不支持BLE设备';
-        break;
-      case 10012:
-        msg = '连接超时';
-        break;
-      case 10013:
-        msg = '连接 deviceId 为空或者是格式不正确';
-        break;
-    }
-    return msg;
-  },
-  startBluetoothDevicesDiscovery() {
-    // 搜索蓝牙设备
-    // 如果正在搜索就跳过
-    if (this._discoveryStarted) {
-      return
-    }
-    this._discoveryStarted = true
-    wx.startBluetoothDevicesDiscovery({
-      allowDuplicatesKey: true, // 允许重复key
-      success: (res) => {
-        // 开启发现蓝牙设备
-        this.onBluetoothDeviceFound();
-      },
-    })
-  },
-  stopBluetoothDevicesDiscovery() {
-    // 关闭蓝牙搜索
-    wx.stopBluetoothDevicesDiscovery()
-  },
-  onBluetoothDeviceFound() {
-    wx.onBluetoothDeviceFound((res) => {
-      res.devices.forEach(device => {
-        if (!device.name && !device.localName) {
-          return;
-        }
-        // 过滤DG的设备 其他的蓝牙设备不需要
-        if (device.name.toUpperCase().indexOf('D-LAB ESTIM') < 0) {
-          return;
-        }
-        // 只要找到一个 就添加到设备 停止发现并连接
+    let sr = await this._device.startDiscovery();
+    if (sr === true) {
+      let cs = await this._device.getConnection();
+      if (cs === true) {
+        // 改变蓝牙状态为正在连接
         this.setData({
-          device
+          'connState': '1'
         });
-        // 停止搜索
-        this.stopBluetoothDevicesDiscovery();
-        // 创建BLE连接
-        this.createBLECOnnection(device.deviceId);
+      } else {
+        msg = cs;
+      }
+    } else {
+      msg = sr;
+    }
+    if (msg) {
+      // 改变蓝牙状态为搜索结束 没有发现设备
+      this.setData({
+        'connState': '2',
+        'connStateMsg': res
       });
-    });
+    }
   },
   onChange(event) {
     this.setData({
@@ -344,181 +249,18 @@ Page({
       showAWaveCharts: this.data.showAWaveCharts
     });
   },
-
-  createBLECOnnection(deviceId) {
-    wx.createBLEConnection({
-      deviceId,
-      success: (res) => {
-        // 连接成功 改变状态
-        this.setData({
-          'connState': '1'
-        })
-        // 注册设备监听
-        wx.onBLECharacteristicValueChange((characteristic) => {
-          switch (characteristic.characteristicId) {
-            // 电池电量
-            case pwChId:
-              let battery = parseInt(ab2hex(characteristic.value), 16);
-              this.setData({
-                battery
-              });
-              break;
-            case abPWChId:
-              // AB电源强度
-              let abPw = this.getAbPw(this.getRecBuffer(characteristic.value));
-              let data = {};
-              data.pw.a = abPw[0] || 0;
-              data.pw.b = abPw[1] || 0;
-              this.setData(data);
-              break;
-          }
-        })
-        //监听电池电量
-        wx.notifyBLECharacteristicValueChange({
-          deviceId,
-          serviceId: pwServiceId,
-          characteristicId: pwChId,
-          state: true,
-        });
-        // 监听AB电源强度
-        wx.notifyBLECharacteristicValueChange({
-          deviceId,
-          serviceId: abServiceId,
-          characteristicId: abPWChId,
-          state: true,
-        });
-        // 读取电源电量
-        wx.readBLECharacteristicValue({
-          deviceId,
-          serviceId: pwServiceId,
-          characteristicId: pwChId,
-        })
-        // 读取AB通道强度
-        wx.readBLECharacteristicValue({
-          deviceId,
-          serviceId: abServiceId,
-          characteristicId: abPWChId,
-        })
-      }
-    })
-  },
-
-  closeBLEConnection() {
-    // 关闭蓝牙连接
-    if (this.diyADg) clearInterval(this.diyADg);
-    if (this.diyBDg) clearInterval(this.diyBDg);
-    // 设置电源=0
-    let data = {
-      pw: {
-        a: 0,
-        b: 0
-      }
-    };
-    this.setData(data);
-    this.sendAbPwChange2BLE();
-    if (this.data.device.deviceId) {
-      wx.closeBLEConnection({
-        deviceId: this.data.device.deviceId
-      });
-    }
-  },
-
-  getAbPw(str) {
-    let ts = str.substring(2);
-    let aspw = [];
-    if (ts.length == 22) {
-      aspw[1] = parseInt(ts.substring(0, 12), 2);
-      aspw[0] = parseInt(ts.substring(12), 2);
-    }
-    return aspw;
-  },
-  getBinaryStr(str) {
-    while (str.length < 8) {
-      str = str + '0';
-    }
-    return str;
-  },
-  getRecBuffer(buf) {
-    const dataView = new DataView(buf);
-    let arr = new Array();
-    arr[2] = this.getBinaryStr((dataView.getUint8(0)).toString(2));
-    arr[1] = this.getBinaryStr((dataView.getUint8(1)).toString(2));
-    arr[0] = this.getBinaryStr((dataView.getUint8(2)).toString(2));
-    return arr.join('');
-  },
-  getSendBuffer(str) {
-    let bArr = new ArrayBuffer(3);
-    let dataView = new DataView(bArr);
-    let arr = new Array();
-    for (var i = 0; i < 3; i++) {
-      var i2 = i * 8;
-      let tempStr = Object.assign(str);
-      if (i == 0) {
-        arr[2] = this.getBytes(tempStr.substring(i2, i2 + 8));
-      } else if (i == 2) {
-        arr[0] = this.getBytes(tempStr.substring(i2, i2 + 8));
-      } else {
-        arr[i] = this.getBytes(tempStr.substring(i2, i2 + 8));
-      }
-    }
-    dataView.setUint8(0, arr[0]);
-    dataView.setUint8(1, arr[1]);
-    dataView.setUint8(2, arr[2]);
-    return bArr;
-  },
-  getBytes(str) {
-    if (str == null) {
-      throw new Error("when bit string convert to byte, Object can not be null!")
-    } else if (8 != str.length) {
-      throw new Error("bit string'length must be 8");
-    } else {
-      try {
-        if (str.charAt(0) == '0') {
-          return parseInt(str, 2);
-        }
-        if (str.charAt(0) == '1') {
-          return parseInt(str, 2) - 256;
-        }
-        return 0;
-      } catch (err) {
-        throw new Error("bit string convert to byte failed, byte String must only include 0 and 1!");
-      }
-    }
-  },
   pwChange(e) {
+    // 电影强度变更
     let pwObj = e.detail;
     let data = {};
     data['pw.' + pwObj.channel] = pwObj.pw;
     this.setData(data);
-    this.sendAbPwChange2BLE();
+    this._device.setPw(this.data.pw);
   },
-  sendAbPwChange2BLE() {
-    // 获取双通道的电量
-    let abPw = this.getPwBinaryString(this.data.pw.a, this.data.pw.b);
-    //let abPw = '000000000000000011010010';
-    let buf = this.getSendBuffer(abPw);
-    console.log("set power a = %s b = %s", this.data.pw.a, this.data.pw.b);
-    // 发送数据
-    if (!this.data.device || !this.data.device.deviceId) {
-      return;
-    }
-    wx.writeBLECharacteristicValue({
-      deviceId: this.data.device.deviceId,
-      serviceId: abServiceId,
-      characteristicId: abPWChId,
-      value: buf,
-    })
-  },
-  getPwBinaryString(apw, bpw) {
-    let astr = apw.toString(2);
-    let bstr = bpw.toString(2);
-    while (astr.length < 11) {
-      astr = "0" + astr;
-    }
-    while (bstr.length < 11) {
-      bstr = "0" + bstr;
-    }
-    return "00" + bstr + astr;
+  pwChanged(channel, pw){
+    let data = {};
+    data['pw.' + channell] = pw;
+    this.setData(data);
   },
   // playA(e, wave, append) {
 
@@ -589,6 +331,9 @@ Page({
   //     }, 100);
   //   }
   // },
+  // sendWaveData(e){
+  //   this._device.sendWaveData(e);
+  // },
   waveSongChange(e) {
     let song = e.detail.value;
     if (!song) {
@@ -633,37 +378,6 @@ Page({
     detail: instance
   }) {
     this.waveChartCmp = instance;
-  },
-  sendWaveData(e) {
-
-    let data = e.detail;
-    // 如果没有二进制数据 说明不正确
-    if (!(data.song && data.song.arrBuffer)) {
-      return;
-    }
-    // 如果没有通道数据 也不正确
-    if (!data.channel) {
-      return;
-    }
-    // 播放列表修改要存储
-    let cha = data.channel;
-    // 默认A通道特性UUID
-    let chid = aChId;
-    // 设置B通道特性UUID
-    if (cha === 'b') {
-      chid = bChId;
-    }
-    console.log("sendWaveData=", e);
-    if (!this.data.device || !this.data.device.deviceId) {
-      return;
-    }
-    wx.writeBLECharacteristicValue({
-      deviceId: this.data.device.deviceId,
-      serviceId: abServiceId,
-      characteristicId: chid,
-      value: data.song.arrBuffer,
-    });
-
   },
 
 })

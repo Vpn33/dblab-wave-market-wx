@@ -4,7 +4,9 @@
         "index/market",
         "index/my-wave-list",
         "index/my-home",
-        "index/component/wave-editor"
+        "index/component/wave-editor",
+        "index/component/power-editor",
+        "index/my-power-list"
     ],
     "tabBar": {
         "custom": true,
@@ -12,15 +14,20 @@
         "selectedColor": "#3cc51f",
         "borderStyle": "black",
         "backgroundColor": "#ffffff",
-        "list": [{
+        "list": [
+            {
                 "pagePath": "index/index"
             },
             {
                 "pagePath": "index/my-wave-list"
             },
             {
+                "pagePath": "index/my-power-list"
+            },
+            {
                 "pagePath": "index/market"
-            }, {
+            },
+            {
                 "pagePath": "index/my-home"
             }
         ]

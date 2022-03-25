@@ -11,11 +11,11 @@
             </view>
             <view>
                 <van-popup show="{{ showPlayType }}" position="bottom">
-                    <van-picker default-index="{{playType}}" show-toolbar title="播放类型" columns="{{ playTypeList }}" value-key="text" bind:confirm="onPlayTypeChange" bind:cancel="closePlayTypePop" />
+                    <van-picker default-index="{{player.playType}}" show-toolbar title="播放类型" columns="{{ playTypeList }}" value-key="text" bind:confirm="onPlayTypeChange" bind:cancel="closePlayTypePop" />
                 </van-popup>
                 <van-icon class="btn-player-item" name="arrow-left" bindtap="prev" />
-                <van-button round type="primary" bindtap="togglePlay" class="btn-player" icon="play" data-channel="{{channel}}" wx:if="{{!invWorker.isRunning}}"></van-button>
-                <van-button round type="primary" bindtap="togglePlay" class="btn-player" icon="stop" data-channel="{{channel}}" wx:if="{{invWorker.isRunning}}"></van-button>
+                <van-button round type="primary" bindtap="togglePlay" class="btn-player" icon="play" data-channel="{{channel}}" wx:if="{{!playing}}"></van-button>
+                <van-button round type="primary" bindtap="togglePlay" class="btn-player" icon="stop" data-channel="{{channel}}" wx:if="{{playing}}"></van-button>
                 <van-icon class="btn-player-item" name="arrow" bindtap="next" />
             </view>
             <view class="player-item-btns-text">
@@ -28,13 +28,13 @@
     <view class="player-item">
         <view class="player-item">电源强度 <a bindtap="showPwHelp">
                 <van-icon name="question" />
-            </a><text>：{{pw}}</text></view>
+            </a><text>：{{player.pw}}</text></view>
         <van-row gutter="10">
             <van-col span="6">
                 <van-button icon="minus" class="mini-btn" type="default" size="mini" bindtap="subAp" bindlongpress="subLongAp" bindtouchend="endSubLongAp"></van-button>
             </van-col>
             <van-col span="12">
-                <van-slider class="player-pw-slider" binddrag="apChange" min="0" max="2047" value="{{pw}}" show-value />
+                <van-slider class="player-pw-slider" binddrag="apChange" min="0" max="2047" value="{{player.pw}}" show-value />
             </van-col>
             <van-col span="6">
                 <van-button icon="plus" class="mini-btn" type="default" size="mini" bindtap="addAp" bindlongpress="addLongAp" bindtouchend="endLongAp"></van-button>
@@ -45,15 +45,63 @@
         <view class="player-item">智能强度 <a bindtap="showAiPwHelp">
                 <van-icon name="question" />
             </a></view>
-        <van-switch name="aiPw" checked="{{ aiPw }}" size="1rem" bind:change="onAiPwChange" />
+        <van-switch name="aiPw" checked="{{ player.aiPw }}" size="1rem" bind:change="onAiPwChange" />
+    </view>
+    <view class="player-item">
+        <view class="player-item">同步强度 <a bindtap="showSyncPwHelp">
+                <van-icon name="question" />
+            </a></view>
+        <van-switch name="syncPw" checked="{{ player.syncPw }}" size="1rem" bind:change="onSyncPwChange" />
+    </view>
+    <view class="player-item">
+        <view class="player-item">自动强度 <a bindtap="showAutoPwHelp">
+                <van-icon name="question" />
+            </a></view>
+        <van-switch name="autoPw" checked="{{ player.autoPwEnabled }}" size="1rem" bind:change="onAutoPwChange" />
+    </view>
+    <view class="player-item" wx:if="{{player.autoPwEnabled}}">
+        <view>自动强度类型</view>
+        <view class="play-item-line">
+            <van-radio-group value="{{ player.autoPwType }}" bind:change="onAutoPwTypeChange" direction="horizontal">
+                <van-radio name="0">循环</van-radio>
+                <van-radio name="1">顺序</van-radio>
+                <van-radio name="2">随机</van-radio>
+            </van-radio-group>
+        </view>
+    </view>
+    <view class="player-item" wx:if="{{player.autoPwEnabled}}">
+        <view>自动强度间隔 <a bindtap="showAutoPwInvHelp">
+                <van-icon name="question" />
+            </a></view>
+        <view class="play-item-line">
+            <van-stepper class="play-item-line-elem inv-stepper" integer min="5" step="5" value="{{ player.autoPwInvTime }}" bind:change="onAutoPwInvTimeChange" />
+            <view class="play-item-line-elem  inv-stepper-text">秒</view>
+        </view>
+    </view>
+    <view class="player-item" wx:if="{{player.autoPwEnabled}}">
+        <view>自动强度方案 <a bindtap="showAutoPwCaseHelp">
+                <van-icon name="question" />
+            </a></view>
+        <view class="play-item-line">
+            <text class="chosePower" bindtap="choosePower">{{ player.autoPwCase.name || '点击选择'}}</text>
+        </view>
+    </view>
+    <view class="player-item">
+        <view>最小时长 <a bindtap="showMinHelp">
+                <van-icon name="question" />
+            </a></view>
+        <view class="play-item-line">
+            <van-stepper class="play-item-line-elem inv-stepper" integer min="5" step="5" value="{{ player.minTime }}" bind:change="onMinTimeChange" />
+            <view class="play-item-line-elem  inv-stepper-text">秒</view>
+        </view>
     </view>
     <view class="player-item">
         <view>定时输出 <a bindtap="showInvHelp">
                 <van-icon name="question" />
             </a></view>
         <view class="play-item-line">
-            <van-switch class="play-item-line-elem inv-stepper-switch" size="1rem" checked="{{ invEnabled }}" bind:change="onInvEnabledChange" />
-            <van-stepper class="play-item-line-elem inv-stepper" min="5" value="{{ playInvTime }}" />
+            <van-switch class="play-item-line-elem inv-stepper-switch" size="1rem" checked="{{ player.invEnabled }}" bind:change="onInvEnabledChange" />
+            <van-stepper class="play-item-line-elem inv-stepper" integer min="5" value="{{ player.playInvTime }}" bind:change="onPlayInvTimeChange" />
             <view class="play-item-line-elem  inv-stepper-text">分</view>
         </view>
     </view>
@@ -62,35 +110,40 @@
                 <van-icon name="question" />
             </a></view>
         <view class="play-item-line">
-            <van-switch class="play-item-line-elem inv-stepper-switch" size="1rem" checked="{{ rdmInvEnabled }}" bind:change="onRdmInvEnabledChange" />
+            <van-switch class="play-item-line-elem inv-stepper-switch" size="1rem" checked="{{ player.rdmInvEnabled }}" bind:change="onRdmInvEnabledChange" />
             <view class="play-item-line-elem  inv-stepper-text">工作</view>
             <!-- <van-stepper class="play-item-line-elem inv-stepper" min="5" value="{{ playRdmInv.wStart }}" /> -->
-            <van-field class="play-item-line-elem time-input" value="{{ playRdmInv.wStart }}" type="number" />
+            <van-field class="play-item-line-elem time-input" value="{{ player.playRdmInv.wStart }}" type="number" bind:change="onWStartChange" />
             <view class="play-item-line-elem  inv-stepper-text">~</view>
-            <van-field class="play-item-line-elem time-input" value="{{ playRdmInv.wEnd }}" type="number" />
+            <van-field class="play-item-line-elem time-input" value="{{ player.playRdmInv.wEnd }}" type="number" bind:change="onWEndChange" />
             <view class="play-item-line-elem  inv-stepper-text">秒</view>
         </view>
         <view class="play-item-line">
             <view class="play-item-line-elem not-show"></view>
             <view class="play-item-line-elem  inv-stepper-text">暂停</view>
             <!-- <van-stepper class="play-item-line-elem inv-stepper" min="5" value="{{ playRdmInv.wStart }}" /> -->
-            <van-field class="play-item-line-elem time-input" value="{{ playRdmInv.pStart }}" type="number" />
+            <van-field class="play-item-line-elem time-input" value="{{ player.playRdmInv.pStart }}" type="number" bind:change="onPStartChange" />
             <view class="play-item-line-elem  inv-stepper-text">~</view>
-            <van-field class="play-item-line-elem time-input" value="{{ playRdmInv.pEnd }}" type="number" />
+            <van-field class="play-item-line-elem time-input" value="{{ player.playRdmInv.pEnd }}" type="number" bind:change="onPEndChange" />
             <view class="play-item-line-elem  inv-stepper-text">秒</view>
         </view>
         <view class="player-item">
             <view class="player-item">双通道波形优先 <a bindtap="showDbChannelHelp">
                     <van-icon name="question" />
                 </a></view>
-            <van-switch name="dbChannel" checked="{{ dbChannel }}" size="1rem" bind:change="onDbChannelChange" />
+            <van-switch name="dbChannel" checked="{{ player.dbChannel }}" size="1rem" bind:change="onDbChannelChange" />
         </view>
     </view>
     <view class="player-list-tools">
         <van-icon name="delete-o" />
     </view>
     <view class="player-item play-list h-scorller">
-        <play-list play-list="{{playList || []}}" active-idx="{{playingIdx}}" bind:waveclick="onPlayWaveClick" bind:change="onPlayListChange"></play-list>
+        <play-list play-list="{{player.playList || []}}" active-idx="{{player.playingIdx}}" bind:clickItem="onPlayWaveClick" bind:change="onPlayListChange"></play-list>
     </view>
+    <van-popup show="{{ showChoosePower}}" bind:close="onCloseChoosePower" position="bottom">
+        <view class="pop-content h-scorller">
+            <play-list play-list="{{powerList|| []}}" active-idx="{{powerCaseIdx}}" type="power" bind:clickItem="onPowerCaseClick" bind:change="onPowerCaseChange"></play-list>
+        </view>
+    </van-popup>
     <van-dialog id="van-dialog" />
 </view>

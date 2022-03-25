@@ -1,0 +1,90 @@
+/* index/component/power-editor.wxss */
+
+.power-info .van-field__control {
+    color: blanchedalmond;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.channel-stage {
+    margin-bottom: 1rem;
+    padding-top: 1rem;
+    border-top: 5px dotted #F9E49C;
+}
+
+.power-stage {
+    box-sizing: border-box;
+    border: 1px solid #F9E49C;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 5px 0px;
+    min-width: 20rem;
+    min-height: 10rem;
+    margin-right: 5px;
+}
+
+.player-item .metas {
+    width: 90%;
+    height: 10rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 1rem 1rem 0.5rem;
+    white-space: nowrap;
+}
+
+
+.player-item .meta-item {
+    width: 1.5rem;
+    height: 100%;
+    padding: 0px 2px;
+    display: inline-block;
+}
+
+.player-item .meta-item .meta-item-del {
+    height: 20%;
+    text-align: center;
+}
+
+.player-item .meta-item .meta-item-slider {
+    height: 80%;
+}
+
+.player-item .meta-item .meta-item-slider {
+    height: 80%;
+}
+
+.player-item .meta-item .van-slider {
+    left: 50%;
+}
+
+.item-text {
+    width: 50%;
+    display: inline-block;
+}
+
+.item-tools {
+    width: 50%;
+    display: inline-block;
+    text-align: right;
+}
+
+.item-tools .van-button__text {
+    font-weight: bold;
+}
+.item-tools .van-button {
+    margin-left: 5px;
+}
+.custom-button{
+    background: #F9E49c;
+    border: 1px solid #F9E49c;
+    color: black;
+    border-radius: 5px;
+    padding: 2px 5px;
+}
+.power-editor-btns {
+    display: flex;
+    justify-content: center;
+}
+.power-editor-btns .player-btn {
+    margin: 0px 5px;
+}

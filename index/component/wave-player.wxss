@@ -59,6 +59,7 @@
     border-right: 1px #F9E49C solid;
     border-top: 1px #F9E49C solid;
 }
+
 .player-list-item:last-child .van-cell {
     border-bottom: 1px #F9E49C solid;
 }
@@ -82,6 +83,8 @@
 
 .play-item-line {
     height: var(--stepper-input-height, 28px);
+    line-height: var(--stepper-input-height, 28px);
+    display: flex;
 }
 
 .play-item-line-elem {
@@ -186,5 +189,15 @@
     flex-direction: column-reverse;
     vertical-align: bottom;
     margin-left: 0.5rem;
+}
 
+.chosePower {
+    text-decoration: underline;
+}
+
+.pop-content {
+    height: 20rem;
+    background-color: black;
+    overflow-y: auto;
+    margin-bottom: var(--tabbar-height, 50px);
 }

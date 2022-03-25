@@ -16,6 +16,8 @@
         "van-popup": "@vant/weapp/popup/index",
         "van-picker": "@vant/weapp/picker/index",
         "van-stepper": "@vant/weapp/stepper/index",
-        "van-field": "@vant/weapp/field/index"
+        "van-field": "@vant/weapp/field/index",
+        "van-radio": "@vant/weapp/radio/index",
+        "van-radio-group": "@vant/weapp/radio-group/index"
     }
 }

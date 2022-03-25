@@ -32,7 +32,7 @@ view {
     --tabbar-item-text-color: blanchedalmond;
     --tabbar-item-active-color: #F9E49C;
     --radio-label-color: blanchedalmond;
-    --radio-checked-icon-color: blanchedalmond;
+    --radio-checked-icon-color: #F9E49C;
     --overlay-background-color: rgb(41 41 41 / 70%);
 }
 

@@ -11,6 +11,10 @@ Component({
       icon: "waves",
       text: "我的波形"
     }, {
+      url: "/index/my-power-list",
+      icon: "chart-trending-o",
+      text: "我的电源"
+    }, {
       url: "/index/market",
       icon: "shopping-cart",
       text: "市场"

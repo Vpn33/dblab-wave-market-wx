@@ -1,0 +1,41 @@
+<!--index/component/power-editor.wxml-->
+<view class="container">
+    <view class="page-body">
+        <view class="power-info">
+            <van-field value="{{power.name}}" placeholder="请输入电源方案名称" border="{{ false }}" bind:change="onChange" />
+        </view>
+        <view>
+            <view class="power-stage add-stage">
+                <view class="player-item">
+                    <view class="item-title">
+                        <view class="item-text"> 电源节点</view>
+                        <view class="item-tools">
+                            <van-button icon="plus" class="mini-btn" size="mini" type="default" bindtap="addMeta"/>
+                            <van-button icon="minus" class="mini-btn" size="mini" type="default" bindtap="subMeta" />
+                        </view>
+                    </view>
+                    <view class="metas h-scorller">
+                        <view class="meta-item" wx:for="{{power.metas}}" wx:for-index="mIdx" wx:for-item="m" wx:key="mIdx">
+                            <view class="meta-item-del">
+                                <van-icon wx:if="{{mIdx > 0}}" name="cross" bindtap="subOneMeta" data-meta-idx="{{mIdx}}" />
+                            </view>
+                            <view class="meta-item-slider">
+                                <van-slider min="-30" max="30" value="{{-m.z}}" data-meta-idx="{{mIdx}}" vertical bind:drag="onMetaZChange" active-color="#e5e5e5" inactive-color="#F9E49C" use-button-slot>
+                                    <view class="custom-button" slot="button">{{ m.z }}</view>
+                                </van-slider>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+        <view class="power-editor-btns">
+            <view>
+                <van-button type="primary" class="player-btn" bindtap="savePower">保存</van-button>
+                <van-button type="primary" class="player-btn" bindtap="savePowerAs">另存为</van-button>
+            </view>
+        </view>
+    </view>
+
+    <van-toast id="van-toast" />
+</view>

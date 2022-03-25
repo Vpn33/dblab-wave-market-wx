@@ -7,7 +7,7 @@
     padding: 5px;
     margin: 5px 0px;
     min-width: 20rem;
-    height: 26rem;
+    min-height: 26rem;
     margin-right: 5px;
 }
 
@@ -41,7 +41,7 @@
 }
 
 .wave-channel-stage {
-    padding: 5px;
+    /* padding: 5px; */
     overflow-x: auto;
     overflow-y: hidden;
     display: flex;
@@ -117,7 +117,7 @@
 
 .player-item .metas {
     width: 90%;
-    height: 8rem;
+    height: 10rem;
     overflow-x: auto;
     overflow-y: hidden;
     padding: 0 1rem 1rem 0.5rem;

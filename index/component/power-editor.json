@@ -1,0 +1,11 @@
+{
+    "component": true,
+    "styleIsolation": "shared",
+    "usingComponents": {
+        "van-button": "@vant/weapp/button/index",
+        "van-field": "@vant/weapp/field/index",
+        "van-switch": "@vant/weapp/switch/index",
+        "van-toast": "@vant/weapp/toast/index",
+        "van-slider": "@vant/weapp/slider/index"
+    }
+}

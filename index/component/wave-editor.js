@@ -7,6 +7,7 @@ import tools from '../../lib/tools';
 import moment from "moment";
 import '../../lib/lodash-init';
 import _ from "lodash";
+import Device from '../../lib/device';
 
 // 小节模板
 let stageTmp = {
@@ -61,17 +62,6 @@ Component({
         waveId: {
             type: String,
             value: '',
-        },
-        channel: {
-            type: String,
-            value: '',
-        },
-        channelPw: {
-            type: Object,
-            value: {
-                a: 0,
-                b: 0
-            },
         }
     },
 
@@ -92,7 +82,13 @@ Component({
         bChannelEnable: true, // B通道启用
         waveAChartsOpt: getHalfWaveChartsOpt(), // A通道波形图参数
         waveBChartsOpt: getHalfWaveChartsOpt(), // B通道波形图参数
-        wave: {},
+        pw: { // 电源强度
+            a: 0,
+            b: 0
+        },
+        wave: {
+            channelType: '0' // 通道类型 0-单通道 1-双通道
+        },
         // wave:{
         //     name: "潮汐",
         //     author: "XuDL",
@@ -149,25 +145,45 @@ Component({
         // }
         showXyzImport: false, // 是否显示对话框
         xyzImpData: "", // xyz格式的import数据
+        visibleHeight: '',
+        playerHeight: '2rem'
+    },
+    pageLifetimes: {
+        show: function () {
+            // 页面被展示
+            // 获取全局变量蓝牙设备
+            if (!this._device) {
+                this._device = getApp().blDevice;
+            }
+            // 设置发送数据的回调函数
+            this._device.setSendedFunc('a', this.sendedData, this);
+            // 设置 电源改变回调函数
+            this._device.setPwChangedFunc('a', this.setPwChangedFunc, this);
+
+            // 设置发送数据的回调函数
+            this._device.setSendedFunc('b', this.sendedData, this);
+            // 设置 电源改变回调函数
+            this._device.setPwChangedFunc('b', this.setPwChangedFunc, this);
+            // 读取电源强度缓存
+            this.getPw();
+        },
     },
     lifetimes: {
         attached: function () {
+            this._pwChartsData = {};
+            this._waveChartsData = {};
             //console.log(111111)
-            let data = wa.analyzeWave(this.data.wave);
+            //let data = wa.analyzeWave(this.data.wave);
             //console.log(data);
         },
         ready: function () {
+            this.getPlayerHeight();
             // 在组件实例进入页面节点树时执行
             let waveId = this.data.waveId;
             if (!waveId) {
                 return;
             }
-            let channel = this.data.channel;
-            if (channel) {
-                this.setData({
-                    channel
-                });
-            }
+
             // 加载波形
             this.readExistsWave(waveId);
         }
@@ -189,6 +205,91 @@ Component({
      * 组件的方法列表
      */
     methods: {
+        sendedData(song, time, channel) {
+            this.writeCharts(channel, song, time);
+        },
+        setPwChangedFunc(ap, bp) {
+
+        },
+        writeCharts(channel, song, time) {
+            // (x + y) / 100 = 波形数据在100毫秒内会创建几次脉冲
+            // let pulseCnt = parseInt((song.x || 0) + (song.y) / 100);
+            if (!this._pwChartsData[channel]) {
+                this._pwChartsData[channel] = [];
+            }
+            if (!this._waveChartsData[channel]) {
+                this._waveChartsData[channel] = [];
+            }
+            // 计算0.1秒 100毫秒内一共有多少次脉冲图像
+            for (let t = 0; t < 100; t++) {
+                let dt = time + t;
+                if (0 == (t % song.y)) {
+                    for (let i = 0; i < song.x; i++) {
+                        dt = dt + i;
+                        // 电源强度
+                        this._pwChartsData[channel].push([dt, this.data.pw[channel]]);
+                        if (this._pwChartsData[channel].length > 200) {
+                            this._pwChartsData[channel].shift();
+                        }
+                        // 波形数据
+                        this._waveChartsData[channel].push([dt, song.z]);
+                        if (this._waveChartsData[channel].length > 200) {
+                            this._waveChartsData[channel].shift();
+                        }
+                    }
+                }
+            }
+            this.setCharts(channel, this._waveChartsData[channel], this._pwChartsData[channel]);
+        },
+        setCharts(channel, waveChartsData, pwChartsData) {
+            let chartCmp = null;
+            if (channel === 'a') {
+                chartCmp = this.waveACharter;
+            } else {
+                chartCmp = this.waveBCharter;
+            }
+            if (!chartCmp) {
+                return;
+            }
+            chartCmp.setOption({
+                series: [{
+                    data: waveChartsData
+                }, {
+                    data: pwChartsData
+                }]
+            });
+        },
+        clearCharts() {
+            // 清空图像
+            this._waveChartsData = {
+                a: [],
+                b: []
+            };
+            this._pwChartsData = {
+                a: [],
+                b: []
+            };
+            if (this.waveACharter) {
+                this.setCharts('a', [], []);
+                this.waveACharter.clear();
+
+            }
+            if (this.waveBCharter) {
+                this.setCharts('b', [], []);
+                this.waveBCharter.clear();
+            }
+        },
+        getPw() {
+            // 读取电量
+            let ap = this._device.getPw('a');
+            let bp = this._device.getPw('b');
+            this.setData({
+                pw: {
+                    a: ap,
+                    b: bp
+                }
+            });
+        },
         async readExistsWave(waveId) {
             let wave = await wa.readWave(waveId);
             this.setData({
@@ -243,13 +344,34 @@ Component({
         onChartsInstance(e) {
             let name = e.target.dataset['compName'];
             this[name] = e.detail;
-            console.log("waveAChartsOpt = ", this.waveAChartsOpt)
+            this.setCharts('a', [], []);
+            this.setCharts('b', [], []);
+            console.log("chartInstance = ", name);
         },
         toggleCharts(e) {
             let showCharts = this.data.isShowChart;
             this.setData({
                 isShowChart: !showCharts
             });
+            this.getPlayerHeight();
+            if (!this.data.isShowChart) {
+                this.clearCharts();
+            }
+        },
+        getPlayerHeight() {
+
+            // 当前显示的高度
+            this.setData({
+                visibleHeight: wx.getSystemInfoSync().windowHeight + 'px'
+            });
+
+            const query = wx.createSelectorQuery();
+            query.select(".wave-player").boundingClientRect((rect) => {
+                // 播放器节点的高度
+                this.setData({
+                    playerHeight: rect.height + 'px'
+                });
+            }).exec();
         },
         togglePlaying(e) {
             let isPlaying = this.data.isPlaying;
@@ -261,7 +383,7 @@ Component({
             let cvl = e.detail;
             let data = {};
             let ct = this.data.wave.channelType || '0';
-            if ( ct === '0') {
+            if (ct === '0') {
                 data['wave.stages'] = cvl.channelWave.stages;
             } else {
                 data['wave.' + cvl.channelName + '.stages'] = cvl.channelWave.stages;
@@ -303,7 +425,7 @@ Component({
             if (wave.b && (wave.b.enabled === false || tools.isEmpty(wave.b.stages))) {
                 delete wave.b;
             }
-             
+
             if (wave.channelType === '1') {
                 if (wave.a && wave.b) {
                     let st = [];
@@ -330,7 +452,7 @@ Component({
 
             // 创建时间
             if (!wave.createTime) {
-                wave.createTim = moment().format("YYYY-MM-DD HH:mm:ss")
+                wave.createTime = moment().format("YYYY-MM-DD HH:mm:ss")
             }
             // 写入文件
             let res = await wa.writeWave(wave);
@@ -347,6 +469,6 @@ Component({
 
 
             // console.log("wave = ", JSON.stringify(this.data.wave, null, 4));
-        },        
+        },
     }
 })

@@ -1,93 +1,95 @@
 <!--index/component/wave-editor.wxml-->
+<page-meta page-style="{{ 'overflow: hidden;' }}" />
 <wxs src="../../lib/tools.wxs" module="tools"></wxs>
-
 <view class="container">
+    <view class="wave-player">
+        <!-- <view class="gradual " wx:if="{{sIdx != 0}}">
+            <van-icon name="arrow-up" bindtap="onDelStage" data-stage-idx="{{sIdx}}" />
+        </view> -->
+        <view>
+            <van-row class="wave-player-channeles">
+                <van-col span="12">
+                    <view class="wave-player-channel">
+                        <view class="channel-name"><text>A通道</text></view>
+                        <view class="channel-pw">
+                            <view class="channel-pw-text"><text>电源强度</text></view>
+                            <view class="channel-pw-btn">
+                                <van-stepper value="{{ pw.a }}" min="0" max="2047" bind:change="onPlayerPwChange" data-channel-name="a" />
+                            </view>
+                        </view>
+                        <view class="play-wave-charts" wx:if="{{isShowChart}}">
+                            <chart chart-class="chart" model:option="{{ waveAChartsOpt }}" bindinstance="onChartsInstance" width="100%" height="100%" data-comp-name="waveACharter" />
+                        </view>
+                    </view>
+                </van-col>
+                <van-col span="12">
+                    <view class="wave-player-channel">
+                        <view class="channel-name"><text>B通道</text></view>
+                        <view class="channel-pw">
+                            <view class="channel-pw-text"><text>电源强度</text></view>
+                            <view class="channel-pw-btn">
+                                <van-stepper value="{{ pw.b }}" min="0" max="2047" bind:change="onPlayerPwChange" data-channel-name="b" />
+                            </view>
+                        </view>
+                        <view class="play-wave-charts" wx:if="{{isShowChart}}">
+                            <chart chart-class="chart" model:option="{{ waveBChartsOpt }}" bindinstance="onChartsInstance" width="100%" height="100%" data-comp-name="waveACharter" />
+                        </view>
+                    </view>
+                </van-col>
+            </van-row>
+        </view>
+        <view class="player-btns">
+            <van-button type="primary" class="player-btn" bindtap="toggleCharts" wx:if="{{!isShowChart}}">
+                <van-icon name="eye-o" />
+            </van-button>
+            <van-button type="primary" class="player-btn" bindtap="toggleCharts" wx:if="{{isShowChart}}">
+                <van-icon name="closed-eye" />
+            </van-button>
+            <van-button type="primary" bindtap="play" class="player-btn" bindtap="togglePlaying" wx:if="{{!isPlaying}}">
+                <van-icon name="play" />
+            </van-button>
+            <van-button type="primary" bindtap="stop" class="player-btn" bindtap="togglePlaying" wx:if="{{isPlaying}}">
+                <van-icon name="stop" />
+            </van-button>
+        </view>
+    </view>
     <view class="page-body">
         <!-- <view class="wave-tips">
             <van-button plain bindtap="createWave">创建</van-button>
             <van-button plain bindtap="readWave">读取</van-button>
             <van-button plain icon="add-o" bindtap="createStage">添加小节</van-button>
         </view> -->
-        <view class="wave-info">
-            <van-field value="{{wave.name}}" placeholder="请输入波形名称" border="{{ false }}" bind:change="onChange" />
-        </view>
-        <view>
-            <view class="wave-channel-type">
-                <van-radio-group value="{{ wave.channelType || '0'}}" bind:change="onChannelTypeChange" direction="horizontal">
-                    <van-radio name="0">单通道</van-radio>
-                    <van-radio name="1">双通道</van-radio>
-                </van-radio-group>
-            </view>
-            <view wx:if="{{(wave.channelType || '0' ) === '0'}}">
-                <view class="channel-stage">
-                    <channel-wave-edt no-channel="true" channelWave="{{wave}}" bind:change="onChangeStageVal"></channel-wave-edt>
-                </view>
-            </view>
-            <view wx:if="{{(wave.channelType || '0') === '1'}}">
-                <view class="channel-stage">
-                    <channel-wave-edt channel-name="a" channelWave="{{wave.a}}" bind:change="onChangeStageVal"></channel-wave-edt>
-                </view>
-                <view class="channel-stage">
-                    <channel-wave-edt channel-name="b" channelWave="{{wave.b}}" bind:change="onChangeStageVal"></channel-wave-edt>
-                </view>
-            </view>
-        </view>
-        <view class="wave-editor-btns">
-            <view>
-                <!-- <van-button type="primary" class="player-btn" bindtap="showImport">导入</van-button> -->
-                <van-button type="primary" class="player-btn" bindtap="saveWave">保存</van-button>
-                <van-button type="primary" class="player-btn" bindtap="saveWaveAs">另存为</van-button>
-            </view>
-        </view>
-        <view class="wave-player">
-            <view class="gradual " wx:if="{{sIdx != 0}}">
-                <van-icon name="arrow-up" bindtap="onDelStage" data-stage-idx="{{sIdx}}" />
+        <view class="h-scorller" style="overflow-y: auto; height: calc({{visibleHeight}} - ({{playerHeight}} + 1rem));">
+            <view class="wave-info">
+                <van-field value="{{wave.name}}" placeholder="请输入波形名称" border="{{ false }}" bind:change="onChange" />
             </view>
             <view>
-                <van-row class="wave-player-channeles">
-                    <van-col span="12">
-                        <view class="wave-player-channel">
-                            <view class="channel-name"><text>A通道</text></view>
-                            <view class="channel-pw">
-                                <view class="channel-pw-text"><text>电源强度</text></view>
-                                <view class="channel-pw-btn">
-                                    <van-stepper value="{{ channelPw.a }}" min="0" max="2047" bind:change="onPlayerPwChange" data-channel-name="a" />
-                                </view>
-                            </view>
-                            <view class="play-wave-charts" wx:if="{{isShowChart}}">
-                                <chart chart-class="chart" model:option="{{ waveAChartsOpt }}" bindinstance="onChartsInstance" width="100%" height="100%" data-comp-name="waveAChartCmp" />
-                            </view>
-                        </view>
-                    </van-col>
-                    <van-col span="12">
-                        <view class="wave-player-channel">
-                            <view class="channel-name"><text>B通道</text></view>
-                            <view class="channel-pw">
-                                <view class="channel-pw-text"><text>电源强度</text></view>
-                                <view class="channel-pw-btn">
-                                    <van-stepper value="{{ channelPw.b }}" min="0" max="2047" bind:change="onPlayerPwChange" data-channel-name="b" />
-                                </view>
-                            </view>
-                            <view class="play-wave-charts" wx:if="{{isShowChart}}">
-                                <chart chart-class="chart" model:option="{{ waveBChartsOpt }}" bindinstance="onChartsInstance" width="100%" height="100%" data-comp-name="waveBChartCmp" />
-                            </view>
-                        </view>
-                    </van-col>
-                </van-row>
+                <view class="wave-channel-type">
+                    <van-radio-group value="{{ wave.channelType || '0'}}" bind:change="onChannelTypeChange" direction="horizontal">
+                        <van-radio name="0">单通道</van-radio>
+                        <van-radio name="1">双通道</van-radio>
+                    </van-radio-group>
+                </view>
+                <view wx:if="{{(wave.channelType || '0' ) === '0'}}">
+                    <view class="channel-stage">
+                        <channel-wave-edt no-channel="true" channelWave="{{wave}}" bind:change="onChangeStageVal"></channel-wave-edt>
+                    </view>
+                </view>
+                <view wx:if="{{(wave.channelType || '0') === '1'}}">
+                    <view class="channel-stage">
+                        <channel-wave-edt channel-name="a" channelWave="{{wave.a}}" bind:change="onChangeStageVal"></channel-wave-edt>
+                    </view>
+                    <view class="channel-stage">
+                        <channel-wave-edt channel-name="b" channelWave="{{wave.b}}" bind:change="onChangeStageVal"></channel-wave-edt>
+                    </view>
+                </view>
             </view>
-            <view class="player-btns">
-                <van-button type="primary" class="player-btn" bindtap="toggleCharts" wx:if="{{!isShowChart}}">
-                    <van-icon name="eye-o" />
-                </van-button>
-                <van-button type="primary" class="player-btn" bindtap="toggleCharts" wx:if="{{isShowChart}}">
-                    <van-icon name="closed-eye" />
-                </van-button>
-                <van-button type="primary" bindtap="play" class="player-btn" bindtap="togglePlaying" wx:if="{{!isPlaying}}">
-                    <van-icon name="play" />
-                </van-button>
-                <van-button type="primary" bindtap="stop" class="player-btn" bindtap="togglePlaying" wx:if="{{isPlaying}}">
-                    <van-icon name="stop" />
-                </van-button>
+            <view class="wave-editor-btns">
+                <view>
+                    <!-- <van-button type="primary" class="player-btn" bindtap="showImport">导入</van-button> -->
+                    <van-button type="primary" class="player-btn" bindtap="saveWave">保存</van-button>
+                    <van-button type="primary" class="player-btn" bindtap="saveWaveAs">另存为</van-button>
+                </view>
             </view>
         </view>
     </view>

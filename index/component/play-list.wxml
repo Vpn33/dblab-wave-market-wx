@@ -11,7 +11,7 @@
                 <view class="play-cell-title" slot="title" data-idx="{{sIdx}}">
                     <view class="play-cell-title-cont" data-idx="{{sIdx}}">
                         <text class="play-cell-title-name" data-idx="{{sIdx}}">{{ item.name}}</text>
-                        <view class="play-cell-title-ver" data-idx="{{sIdx}}">
+                        <view class="play-cell-title-ver" data-idx="{{sIdx}}" wx:if="{{type != 'power'}}">
                             <text> {{item.author}} {{ item.ver || '1.0'}}</text>
                             <text class="play-cell-double-channel" wx:if="{{(item.a && item.b) || item.dbChannel}}">双通道</text>
                         </view>

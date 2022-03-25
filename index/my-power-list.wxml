@@ -1,0 +1,101 @@
+<!--index/my-power-list.wxml-->
+<wxs module="fn">
+    module.exports = {
+        isOpen: function (arr) {
+            if (arr === null || arr === undefined) {
+                return false;
+            }
+            if (typeof arr === 'boolean') {
+                return arr;
+            }
+            var ass = arr.toString();
+            if (ass === '0') {
+                return false;
+            }
+            if (ass === '1') {
+                return true;
+            }
+            return false;
+        },
+        getChannelType: function (item) {
+            var res = '无';
+            if (item.a && item.b) {
+                res = "双通道";
+            } else if (item.a) {
+                res = "A通道";
+            } else if (item.b) {
+                res = "B通道";
+            }
+            console.log(res);
+            return res;
+        }
+
+    }
+</wxs>
+<view class="container">
+    <van-toast id="van-toast" />
+    <view class="page-body">
+        <view class="play-tools">
+            <van-dropdown-menu active-color="#F9E49C">
+                <van-dropdown-item value="{{ sortCol }}" options="{{ sortColOpt }}" />
+                <van-dropdown-item value="{{ sortType }}" options="{{ sortTypeOpt }}" />
+            </van-dropdown-menu>
+        </view>
+        <view class="add-wave channel-wave-btn">
+            <view class="channel-wave">
+                <van-button icon="plus" type="primary" block bindtap="addPower">新建方案</van-button>
+            </view>
+        </view>
+        <view class="play-list h-scorller">
+            <view class="player-list-item" wx:for="{{powerList}}" wx:for-index="sIdx" wx:key="sIdx">
+                <van-cell class="play-cell" use-label-slot="true">
+                    <view class="play-cell-title" slot="title">
+                        <view class="play-cell-title-cont">
+                            <text class="play-cell-title-name">{{ item.name}}</text>
+                            <view class="play-cell-title-ver">
+                                <text> {{item.author}} {{ item.ver || '1.0'}}</text>
+                                <text class="play-cell-double-channel" wx:if="{{item.a &&item.b}}">双通道</text>
+                            </view>
+                        </view>
+                    </view>
+                    <view class="play-cell-label" slot="label">
+                        <view class="play-cell-label-cont" wx:if="{{fn.isOpen(powerListOpen[sIdx])}}">
+                            <view class="play-cell-label-cont-line">
+                                <text>作者: {{ item.author || '匿名'}}</text>
+                                <text>时长: {{ item.totalTime || '-'}}</text>
+                            </view>
+                            <view class="play-cell-label-cont-line">
+                                <text>通道类型: {{ fn.getChannelType(item)}}</text>
+                                <view class="play-cell-title-cont">
+                                    <text>难度:</text>
+                                    <van-rate value=" {{ item.lv || '1'}}" readonly allow-half size="14px" gutter="2px" void-icon="star" color="#F9E49C" void-color="#eee" count="5" />
+                                </view>
+                                <text>综合得分: {{ item.tolScore || '0.0'}}</text>
+                            </view>
+                            <view class="play-cell-label-cont-line" wx:if="{{item.createTime}}">
+                                <text wx:if="{{item.createTime}}">创建时间: {{item.createTime}}</text>
+                            </view>
+                            <view class="play-cell-label-cont-line" wx:if="{{item.updateTime}}">
+                                <text wx:if="{{item.updateTime}}">修改时间: {{item.updateTime}}</text>
+                            </view>
+                            <view class="play-cell-label-cont-line" wx:if="{{item.pubTime}}">
+                                <text wx:if="{{item.pubTime}}">发布时间: {{item.pubTime}}</text>
+                            </view>
+                            <view class="play-cell-label-cont-line" wx:if="{{item.downTime}}">
+                                <text wx:if="{{item.downTime}}">下载时间: {{item.downTime}}</text>
+                            </view>
+                        </view>
+                    </view>
+                    <view class="play-cell-tools">
+                        <text class="play-cell-btn" bind:tap="setChannel" data-channel="a" data-idx="{{sIdx}}">=A</text>
+                        <text class="play-cell-btn" bind:tap="setChannel" data-channel="b" data-idx="{{sIdx}}">=B</text>
+                        <van-icon class="play-cell-btn" name="setting-o" bind:tap="toEditor" data-idx="{{sIdx}}" />
+                        <van-icon class="play-cell-btn" name="delete" bind:tap="toDelete" data-idx="{{sIdx}}" />
+                        <van-icon class="play-cell-btn" wx:if="{{fn.isOpen(powerListOpen[sIdx])}}" name="arrow-up" bind:tap="toggleOpenCell" data-idx="{{sIdx}}" />
+                        <van-icon class="play-cell-btn" wx:if="{{!fn.isOpen(powerListOpen[sIdx])}}" name="arrow-down" bind:tap="toggleOpenCell" data-idx="{{sIdx}}" />
+                    </view>
+                </van-cell>
+            </view>
+        </view>
+    </view>
+</view>
