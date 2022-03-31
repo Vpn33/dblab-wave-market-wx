@@ -3,7 +3,7 @@
     "styleIsolation": "shared",
     "usingComponents": {
         "play-list": "/index/component/play-list",
-        "chart": "plugin://echarts/chart",
+        "ec-canvas": "./ec-canvas/ec-canvas",
         "van-button": "@vant/weapp/button/index",
         "van-slider": "@vant/weapp/slider/index",
         "van-row": "@vant/weapp/row/index",

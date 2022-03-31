@@ -45,6 +45,10 @@ Component({
         type: { // 默认是波形列表  power是电源方案列表
             type: String,
             value: null
+        },
+        beforeEditor: { //打开editor的回调
+            type: Function,
+            value: null
         }
     },
 
@@ -108,15 +112,18 @@ Component({
         },
         toEditor: function (e) {
             let idx = e.target.dataset['idx'];
-            if (this.data.type === 'power') {
-                wx.navigateTo({
-                    url: 'component/power-editor?powerId=' + this.data.playList[idx].id
-                });
-            } else {
-                wx.navigateTo({
-                    url: 'component/wave-editor?waveId=' + this.data.playList[idx].id,
-                });
-            }
+            this.triggerEvent('beforeEditor', idx);
+            // setTimeout(() => {
+                if (this.data.type === 'power') {
+                    wx.navigateTo({
+                        url: 'component/power-editor?powerId=' + this.data.playList[idx].id
+                    });
+                } else {
+                    wx.navigateTo({
+                        url: 'component/wave-editor?waveId=' + this.data.playList[idx].id,
+                    });
+                }
+            // }, 5000);
         },
         toDelete(e) {
             let idx = e.target.dataset['idx'];

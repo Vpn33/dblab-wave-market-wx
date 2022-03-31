@@ -1,10 +1,11 @@
 <!--index/wave-player.wxml-->
 
-<view class="wave-player">
-    <view class="player-item play-wave-charts" wx:if="{{showCharts}}">
-        <chart chart-class="chart" model:option="{{ waveChartsOpt }}" bindinstance="onInstance" width="100%" height="100%" />
-    </view>
+<view class="wave-channe-player">
+
     <view class="player-item">
+        <view class="player-item play-wave-charts" wx:if="{{showCharts}}">
+            <ec-canvas id="mychart-dom-bar" canvas-id="mychart-bar" ec="{{ ecInstance }}"></ec-canvas>
+        </view>
         <view class="player-item-btns">
             <view class="player-item-btns-text">
                 <text class="player-text" bind:tap="showPlayTypePop">{{playTypeStr}}</text>
@@ -60,12 +61,15 @@
         <van-switch name="autoPw" checked="{{ player.autoPwEnabled }}" size="1rem" bind:change="onAutoPwChange" />
     </view>
     <view class="player-item" wx:if="{{player.autoPwEnabled}}">
-        <view>自动强度类型</view>
+        <view class="player-item">自动强度类型 <a bindtap="showAutoPwTypeHelp">
+                <van-icon name="question" />
+            </a></view>
         <view class="play-item-line">
             <van-radio-group value="{{ player.autoPwType }}" bind:change="onAutoPwTypeChange" direction="horizontal">
-                <van-radio name="0">循环</van-radio>
+                <van-radio name="0">往复</van-radio>
                 <van-radio name="1">顺序</van-radio>
-                <van-radio name="2">随机</van-radio>
+                <van-radio name="2">循环</van-radio>
+                <van-radio name="3">随机</van-radio>
             </van-radio-group>
         </view>
     </view>
@@ -101,7 +105,7 @@
             </a></view>
         <view class="play-item-line">
             <van-switch class="play-item-line-elem inv-stepper-switch" size="1rem" checked="{{ player.invEnabled }}" bind:change="onInvEnabledChange" />
-            <van-stepper class="play-item-line-elem inv-stepper" integer min="5" value="{{ player.playInvTime }}" bind:change="onPlayInvTimeChange" />
+            <van-stepper class="play-item-line-elem inv-stepper" integer min="1" value="{{ player.playInvTime }}" bind:change="onPlayInvTimeChange" />
             <view class="play-item-line-elem  inv-stepper-text">分</view>
         </view>
     </view>
@@ -138,7 +142,7 @@
         <van-icon name="delete-o" />
     </view>
     <view class="player-item play-list h-scorller">
-        <play-list play-list="{{player.playList || []}}" active-idx="{{player.playingIdx}}" bind:clickItem="onPlayWaveClick" bind:change="onPlayListChange"></play-list>
+        <play-list play-list="{{player.playList || []}}" active-idx="{{player.playingIdx}}" bind:clickItem="onPlayWaveClick" bind:change="onPlayListChange" bind:beforeEditor="beforeEditor"></play-list>
     </view>
     <van-popup show="{{ showChoosePower}}" bind:close="onCloseChoosePower" position="bottom">
         <view class="pop-content h-scorller">

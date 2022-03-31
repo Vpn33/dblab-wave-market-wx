@@ -61,7 +61,8 @@ view.container {
 
 .wave-player .play-wave-charts {
     margin: 5px;
-    height: 7em;
+    width: 100%;
+    height: 9em;
     border: 1px #F9E49C solid;
     border-radius: 5px;
 }

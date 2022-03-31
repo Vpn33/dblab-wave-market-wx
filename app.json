@@ -40,9 +40,6 @@
     },
     "sitemapLocation": "sitemap.json",
     "plugins": {
-        "echarts": {
-            "version": "2.1.0",
-            "provider": "wx1db9e5ab1149ea03"
-        }
+       
     }
 }

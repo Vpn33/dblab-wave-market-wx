@@ -8,23 +8,39 @@ import moment from "moment";
 import '../../lib/lodash-init';
 import _ from "lodash";
 import Device from '../../lib/device';
+import * as echarts from '../../lib/echarts.min';
+let charter = {};
 
-// 小节模板
-let stageTmp = {
-    pw: 0, // 电源增量
-    hzType: 0, //频率类型 0-固定 1-节内渐变 2-元间渐变 3-元内渐变
-    hz: 1, // 频率
-    hzGradient: 0, // 渐变类型,
-    times: 1, // 小节时长
-    metas: [{
-        z: 31 // 振幅 0 - 31
-    }], // 默认只有一个元
+function ecAInstance(canvas, width, height, dpr) {
+    charter.a = echarts.init(canvas, null, {
+        width: width,
+        height: height,
+        devicePixelRatio: dpr // 像素
+    });
+    canvas.setChart(charter.a);
+
+    var option = getHalfWaveChartsOpt();
+    charter.a.setOption(option);
+    return charter.a;
+}
+
+function ecBInstance(canvas, width, height, dpr) {
+    charter.b = echarts.init(canvas, null, {
+        width: width,
+        height: height,
+        devicePixelRatio: dpr // 像素
+    });
+    canvas.setChart(charter.b);
+
+    var option = getHalfWaveChartsOpt();
+    charter.b.setOption(option);
+    return charter.b;
 }
 
 function getHalfWaveChartsOpt() {
     let tmp = cons.getWaveChartsOpt();
-    tmp.legend.data[0].textStyle.fontSize = 9;
-    tmp.legend.data[1].textStyle.fontSize = 9;
+    tmp.legend.data[0].textStyle.fontSize = 8;
+    tmp.legend.data[1].textStyle.fontSize = 8;
     return tmp;
 }
 
@@ -62,6 +78,10 @@ Component({
         waveId: {
             type: String,
             value: '',
+        },
+        edtChannel: {
+            type: String,
+            value: null,
         }
     },
 
@@ -146,7 +166,13 @@ Component({
         showXyzImport: false, // 是否显示对话框
         xyzImpData: "", // xyz格式的import数据
         visibleHeight: '',
-        playerHeight: '2rem'
+        playerHeight: '2rem',
+        ecAInstance: {
+            onInit: ecAInstance
+        },
+        ecBInstance: {
+            onInit: ecBInstance
+        },
     },
     pageLifetimes: {
         show: function () {
@@ -164,14 +190,30 @@ Component({
             this._device.setSendedFunc('b', this.sendedData, this);
             // 设置 电源改变回调函数
             this._device.setPwChangedFunc('b', this.setPwChangedFunc, this);
+            // 校验通道是否正在执行
+            if (this.data.edtChannel) {
+                if (this._device.isRunning(this.data.edtChannel)) {
+                    this._device.set
+                }
+            }
+
             // 读取电源强度缓存
             this.getPw();
         },
+        hide: function () {
+            this.clearCharts();
+        }
     },
     lifetimes: {
         attached: function () {
-            this._pwChartsData = {};
-            this._waveChartsData = {};
+            this._pwChartsData = {
+                a: [],
+                b: []
+            };
+            this._waveChartsData = {
+                a: [],
+                b: []
+            };
             //console.log(111111)
             //let data = wa.analyzeWave(this.data.wave);
             //console.log(data);
@@ -228,12 +270,12 @@ Component({
                         dt = dt + i;
                         // 电源强度
                         this._pwChartsData[channel].push([dt, this.data.pw[channel]]);
-                        if (this._pwChartsData[channel].length > 200) {
+                        if (this._pwChartsData[channel].length > 100) {
                             this._pwChartsData[channel].shift();
                         }
                         // 波形数据
                         this._waveChartsData[channel].push([dt, song.z]);
-                        if (this._waveChartsData[channel].length > 200) {
+                        if (this._waveChartsData[channel].length > 100) {
                             this._waveChartsData[channel].shift();
                         }
                     }
@@ -242,41 +284,35 @@ Component({
             this.setCharts(channel, this._waveChartsData[channel], this._pwChartsData[channel]);
         },
         setCharts(channel, waveChartsData, pwChartsData) {
-            let chartCmp = null;
-            if (channel === 'a') {
-                chartCmp = this.waveACharter;
-            } else {
-                chartCmp = this.waveBCharter;
+            let chartCmp = charter[channel];
+            if (chartCmp) {
+                chartCmp.setOption({
+                    series: [{
+                        data: waveChartsData
+                    }, {
+                        data: pwChartsData
+                    }]
+                });
             }
-            if (!chartCmp) {
-                return;
-            }
-            chartCmp.setOption({
-                series: [{
-                    data: waveChartsData
-                }, {
-                    data: pwChartsData
-                }]
-            });
         },
         clearCharts() {
             // 清空图像
-            this._waveChartsData = {
-                a: [],
-                b: []
-            };
-            this._pwChartsData = {
-                a: [],
-                b: []
-            };
+            // this._waveChartsData = {
+            //     a: [],
+            //     b: []
+            // };
+            // this._pwChartsData = {
+            //     a: [],
+            //     b: []
+            // };
             if (this.waveACharter) {
                 this.setCharts('a', [], []);
-                this.waveACharter.clear();
+                this.waveACharter = null;
 
             }
             if (this.waveBCharter) {
                 this.setCharts('b', [], []);
-                this.waveBCharter.clear();
+                this.waveBCharter = null;
             }
         },
         getPw() {
@@ -342,11 +378,11 @@ Component({
             });
         },
         onChartsInstance(e) {
+            console.log(getApp());
             let name = e.target.dataset['compName'];
             this[name] = e.detail;
-            this.setCharts('a', [], []);
-            this.setCharts('b', [], []);
-            console.log("chartInstance = ", name);
+
+            console.log("chartInstance = ", name, this[name].getOption());
         },
         toggleCharts(e) {
             let showCharts = this.data.isShowChart;
@@ -461,9 +497,10 @@ Component({
                     message: '保存成功'
                 });
                 setTimeout(() => {
-                    wx.switchTab({
-                        url: '/index/my-wave-list'
-                    });
+                    // wx.switchTab({
+                    //     url: '/index/my-wave-list'
+                    // });
+                    wx.navigateBack();
                 }, 500);
             }
 

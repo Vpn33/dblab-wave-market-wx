@@ -115,9 +115,11 @@ Component({
                     message: '保存成功'
                 });
                 setTimeout(() => {
-                    wx.switchTab({
-                        url: '/index/my-power-list'
-                    });
+                    // wx.switchTab({
+                    //     url: '/index/my-power-list'
+                    // });
+                    // 返回上一页
+                    wx.navigateBack();
                 }, 500);
             }
         }

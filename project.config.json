@@ -42,7 +42,7 @@
         "ignoreUploadUnusedFiles": true
     },
     "compileType": "miniprogram",
-    "libVersion": "2.21.3",
+    "libVersion": "2.23.2",
     "appid": "wxb2311caf821ebd99",
     "projectname": "my-db-lab",
     "isGameTourist": false,
