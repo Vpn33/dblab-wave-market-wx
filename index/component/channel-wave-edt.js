@@ -1,6 +1,7 @@
 // index/component/channel-wave-edt.js
 import tools from '../../lib/tools';
 import cons from '../../lib/consts';
+import Dialog from '@vant/weapp/dialog/dialog';
 Component({
     /**
      * 组件的属性列表
@@ -88,6 +89,18 @@ Component({
      * 组件的方法列表
      */
     methods: {
+        showPwHelp() {
+            Dialog.alert({
+                context: this,
+                message: '当小节开始，会以当前电源强度为基准按照设置的增量(或减量)进行电源强度的自动改变。(若开启了自动电源强度，则该设置无效)',
+            });
+        },
+        showHzHelp() {
+            Dialog.alert({
+                context: this,
+                message: '脉冲频率值越低，实际感受到的越快。\n频率值越高，感受到的越慢。\n 频率类型说明↓ \n固定:小节内频率相同 \n节内渐变:小节时长内每个振幅均匀根据频率渐变 \n元内渐变:一次完整的波形内频率渐变不管小节时长多少 \n元间渐变:小节内的全部振幅作为整体(一次完整波形)根据时长渐变',
+            });
+        },
         channgeChannelWave() {
             let channelWave = this.properties.channelWave;
             let data = {

@@ -45,7 +45,7 @@
             </view>
             <view class="player-item">
                 <view class="item-title">
-                    <view class="item-text">脉冲频率 <a bindtap="showPwHelp">
+                    <view class="item-text">脉冲频率 <a bindtap="showHzHelp">
                             <van-icon name="question" />
                         </a><text>：{{ tools.stringify(s.hz) }}</text>
                     </view>
@@ -136,4 +136,5 @@
             <van-icon class="wave-stage-add-btn" name="add-o" bindtap="createStage" />
         </view>
     </view>
+    <van-dialog id="van-dialog" />
 </view>

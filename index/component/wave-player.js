@@ -66,7 +66,7 @@ Component({
             this.setData({
                 player
             });
-            let playType = this.data.playTypeList[this.data.playType];
+            let playType = this.data.playTypeList[parseInt(this.data.player.playType || '0')];
             if (!playType) {
                 playType = this.data.playTypeList[0];
             }
@@ -93,12 +93,13 @@ Component({
             this.setData({
                 playing: false
             });
-            // 重新绘图
-            if (charter) {
-                var option = cons.getWaveChartsOpt();
-                charter.clear();
-                charter.setOption(option, false);
-            }
+            // this.clearCharts();
+            // // 重新绘图
+            // if (charter) {
+            //     var option = cons.getWaveChartsOpt();
+            //     charter.clear();
+            //     charter.setOption(option, false);
+            // }
         },
         beforeEditor() {
             // 跳转前如果开启了 就关闭图像
@@ -301,6 +302,8 @@ Component({
                 playTypeStr: e.detail.value.text,
                 showPlayType: false // 关闭弹出
             });
+            // 设置播放类型
+            this._device.setPlayType(this.data.channel, val);
             // 保存播放器数据到缓存
             this.savePlayer();
         },
@@ -340,68 +343,51 @@ Component({
             if (!this.waveChartsData) {
                 this.waveChartsData = [];
             }
-            // 计算0.1秒 100毫秒内一共有多少次脉冲图像
-            for (let t = 0; t < 100; t++) {
-                let dt = time + t;
-                // 如果x=0 就是休息时长
-                if (song.x === 0) {
-                    // 电源强度
-                    this.pwChartsData.push([dt, this.data.player.pw]);
-                    if (this.pwChartsData.length > 200) {
-                        this.pwChartsData.shift();
-                    }
-                    // 波形数据
-                    this.waveChartsData.push([dt, song.z]);
-                    if (this.waveChartsData.length > 200) {
-                        this.waveChartsData.shift();
-                    }
-                } else {
-                    if (0 == (t % song.y)) {
-                        for (let i = 0; i < song.x; i++) {
-                            dt = dt + i;
-                            // 电源强度
-                            this.pwChartsData.push([dt, this.data.player.pw]);
-                            if (this.pwChartsData.length > 200) {
-                                this.pwChartsData.shift();
-                            }
-                            // 波形数据
-                            this.waveChartsData.push([dt, song.z]);
-                            if (this.waveChartsData.length > 200) {
-                                this.waveChartsData.shift();
-                            }
-                        }
-                    }
-                }
+            // // 计算0.1秒 100毫秒内一共有多少次脉冲图像
+            // for (let t = 0; t < 100; t++) {
+            //     let dt = time + t;
+            //     if (0 == (t % song.y)) {
+            //         for (let i = 0; i < song.x; i++) {
+            //             dt = dt + i;
+            //             // 波形数据
+            //             this.waveChartsData.push([dt, song.z]);
+            //             if (this.waveChartsData.length > 200) {
+            //                 this.waveChartsData.shift();
+            //                 cg = true;
+            //             }
+            //         }
+            //     }
+            // }
+            // let inv = song.x + song.y;
+            // for (let t = 0; t < 100; t++) {
+            //     let dt = time + t;
+            //     if (0 == (t % inv)) {
+            //         // 波形数据
+            //         this.waveChartsData.push([dt, song.z]);
+            //         if (this.waveChartsData.length > 50) {
+            //             this.waveChartsData.shift();
+            //         }
+            //         // 电源强度
+            //         this.pwChartsData.push([dt, this.data.player.pw]);
+            //         if (this.pwChartsData.length > 50) {
+            //             this.pwChartsData.shift();
+            //         }
+            //     }
+            // }
+            let dt = time;
+            // 波形数据
+            this.waveChartsData.push([dt, song.z]);
+            if (this.waveChartsData.length > 50) {
+                this.waveChartsData.shift();
             }
+            // 电源强度
+            this.pwChartsData.push([dt, this.data.player.pw]);
+            if (this.pwChartsData.length > 50) {
+                this.pwChartsData.shift();
+            }
+
             this.setCharts(this.waveChartsData, this.pwChartsData);
         },
-        // writeCharts(hz, z, time) {
-        //     let dt = 0;
-        //     if (this.waveY != null) {
-        //         dt = this.waveY + hz;
-        //     }
-        //     if (!this.waveChartsData) {
-        //         this.waveChartsData = [];
-        //     }
-        //     if (!this.pwChartsData) {
-        //         this.pwChartsData = [];
-        //     }
-        //     // 电源强度
-        //     this.pwChartsData.push([dt, this.data.pw]);
-
-        //     if (this.pwChartsData.length > 30) {
-        //         this.pwChartsData.shift();
-        //     }
-
-        //     // 波形数据
-        //     this.waveChartsData.push([dt, z]);
-        //     if (this.waveChartsData.length > 30) {
-        //         this.waveChartsData.shift();
-        //     }
-        //     this.waveY = dt;
-        //     console.log("charts  z = ", z, "hz = ", hz, "dt = ", dt);
-        //     this.setCharts(this.waveChartsData, this.pwChartsData);
-        // },
         subAp() {
             this._device.addPw(this.data.channel, -1);
         },
@@ -604,10 +590,16 @@ Component({
                 let data = {};
                 data['player.playingIdx'] = idx;
                 this.setData(data);
-                // 切换波形
-                let msg = this._device.changePlay(cha, idx);
-                if (msg) {
-                    Toast.fail(msg);
+                // 如果正在播放
+                if (this._device.isRunning(cha)) {
+                    // 切换波形
+                    let msg = this._device.changePlay(cha, idx);
+                    if (msg) {
+                        Toast.fail(msg);
+                    }
+                } else {
+                    // 设置索引
+                    this._device.setPlayingIdx(cha, idx);
                 }
             }
         },

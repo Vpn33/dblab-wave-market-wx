@@ -26,8 +26,7 @@ Page({
     isDebug: true, // 是否为测试模式
     connState: '-1', // -1-未授权 0-未连接 1-已连接 2-连接中 2-连接失败
     connStateMsg: '', // 连接错误消息
-    activeNames: '1',
-    device: null,
+    activeNames: '1', // 默认A通道显示
     // mySong: [
     //     [1, 9, 4],
     //     [1, 9, 8],
@@ -91,6 +90,14 @@ Page({
       }
       // 打开蓝牙连接
       this.getConnection();
+      if (this._device) {
+        // 设置发送数据的回调函数
+        this._device.setBatteryChangeFunc(this.onBatteryChange, this);
+        let battery = this._device.getBattery() || 0;
+        this.setData({
+          battery
+        });
+      }
     }
   },
 
@@ -140,6 +147,13 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+  onBatteryChange: function (b) {
+    // 电源电量改变
+    let battery = b || 0;
+    this.setData({
+      battery
+    });
   },
   checkAuth() {
     let that = this;
@@ -257,7 +271,7 @@ Page({
     this.setData(data);
     this._device.setPw(this.data.pw);
   },
-  pwChanged(channel, pw){
+  pwChanged(channel, pw) {
     let data = {};
     data['pw.' + channell] = pw;
     this.setData(data);
