@@ -55,7 +55,7 @@
                 </view>
                 <view class="hz-range-silder" wx:if="{{s.hzType != 0}}">
                     <!-- 官网给定理想Frequency范围为10-1000 此时效果最好-->
-                    <van-slider value="{{ s.hz }}" min="10" max="1000" range bind:drag="onHzDrag" data-stage-idx="{{sIdx}}">
+                    <van-slider value="{{ s.hz }}" min="10" max="1000" step="10" range bind:drag="onHzDrag" data-stage-idx="{{sIdx}}">
                     </van-slider>
                 </view>
                 <van-row gutter="10" wx:if="{{s.hzType == 0}}">

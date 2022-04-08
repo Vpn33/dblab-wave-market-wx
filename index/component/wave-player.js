@@ -82,7 +82,34 @@ Component({
     },
     lifetimes: {
         ready: function () {
-
+            let data = ["000010100000110110000001",
+            "000010100000110110000001",
+            "000010100000110110000001",
+            "000010100000110110000001",
+            "000010100000110110000001",
+            "000010100000110110000001",
+            "000010100000110110000001",
+            "000010100000110110000001",
+            "000010100000110110000001",
+            "000010100000110110000001",
+            "000010100000110110000001"
+            ];
+            let waveData = wa.binary2WaveData(data);
+            console.log("waveData = ", JSON.stringify(waveData, null, 2));
+            // data = ["000010100000000100100001",
+            //     "000010100000000100100001",
+            //     "000010100000000100100001",
+            //     "000010100000000100100001",
+            //     "000010100000000100100001",
+            //     "000010100000000100100001",
+            //     "000010100000000100100001",
+            //     "000010100000000100100001",
+            //     "000010100000110100000101",
+            //     "000010100000101100000100",
+            //     "000010100000100101000100"
+            // ];
+            // waveData = wa.binary2WaveData(data);
+            // console.log("waveData = ", JSON.stringify(waveData));
         },
     },
     /**
@@ -321,6 +348,7 @@ Component({
             // 清空图像
             this.waveChartsData = [];
             this.pwChartsData = [];
+            this._preY = 0;
             this.setCharts(this.waveChartsData, this.pwChartsData);
         },
         setCharts(waveChartsData, pwChartsData) {
@@ -343,50 +371,47 @@ Component({
             if (!this.waveChartsData) {
                 this.waveChartsData = [];
             }
-            // // 计算0.1秒 100毫秒内一共有多少次脉冲图像
-            // for (let t = 0; t < 100; t++) {
-            //     let dt = time + t;
-            //     if (0 == (t % song.y)) {
-            //         for (let i = 0; i < song.x; i++) {
-            //             dt = dt + i;
-            //             // 波形数据
-            //             this.waveChartsData.push([dt, song.z]);
-            //             if (this.waveChartsData.length > 200) {
-            //                 this.waveChartsData.shift();
-            //                 cg = true;
-            //             }
-            //         }
-            //     }
-            // }
-            // let inv = song.x + song.y;
-            // for (let t = 0; t < 100; t++) {
-            //     let dt = time + t;
-            //     if (0 == (t % inv)) {
-            //         // 波形数据
-            //         this.waveChartsData.push([dt, song.z]);
-            //         if (this.waveChartsData.length > 50) {
-            //             this.waveChartsData.shift();
-            //         }
-            //         // 电源强度
-            //         this.pwChartsData.push([dt, this.data.player.pw]);
-            //         if (this.pwChartsData.length > 50) {
-            //             this.pwChartsData.shift();
-            //         }
-            //     }
-            // }
-            let dt = time;
-            // 波形数据
-            this.waveChartsData.push([dt, song.z]);
-            if (this.waveChartsData.length > 50) {
-                this.waveChartsData.shift();
-            }
-            // 电源强度
-            this.pwChartsData.push([dt, this.data.player.pw]);
-            if (this.pwChartsData.length > 50) {
-                this.pwChartsData.shift();
+            if (!this._preTime) {
+                this._preTime = time;
             }
 
+            let dt = this._preTime;
+            if (100 - song.y >= 0) {
+                let runT = parseInt(100 / song.y);
+                let modT = parseInt(100 % song.y);
+                // 小于100毫秒内需要判断脉冲次数
+                for (let y = 0; y < runT; y++) {
+                    // 循环添加脉冲
+                    for (let i = 0; i < song.x; i++) {
+                        // console.log("dt = ", dt);
+                        // 波形数据
+                        this.waveChartsData.push([dt, song.z]);
+                        // 电源强度
+                        this.pwChartsData.push([dt, this.data.player.pw]);
+                        dt++;
+                    }
+                    dt += song.y;
+                }
+                // 还要加上余数的时间
+                dt += modT;
+                this._preTime = dt;
+            } else {
+                // 大于100毫秒的 直接添加设置下次波形开始时间
+                // 循环添加脉冲
+                for (let i = 0; i < song.x; i++) {
+                    // 波形数据
+                    this.waveChartsData.push([dt, song.z]);
+                    // 电源强度
+                    this.pwChartsData.push([dt, this.data.player.pw]);
+                    dt++;
+                }
+                this._preTime = dt + song.y;
+            }
+            // 最大显示数据
+            this.waveChartsData = _.takeRight(this.waveChartsData, 300);
+            this.pwChartsData = _.takeRight(this.pwChartsData, 300);
             this.setCharts(this.waveChartsData, this.pwChartsData);
+
         },
         subAp() {
             this._device.addPw(this.data.channel, -1);

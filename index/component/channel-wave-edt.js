@@ -67,7 +67,7 @@ Component({
         // 挑逗1 元内渐变 一次完整的波形内频率渐变不管小节时长多少
         // 波浪涟漪 元间渐变 小节内的全部振幅作为整体(一次完整波形)根据时长渐变 
         hzTypeArr: ["固定", "节内渐变", "元内渐变", "元间渐变"],
-        hzGradientArr: ["高 -> 低", "低 -> 高"],
+        hzGradientArr: ["快 -> 慢", "慢 -> 快"],
         channelEnable: true, // 通道启用
     },
     observers: {
