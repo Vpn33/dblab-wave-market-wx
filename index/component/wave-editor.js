@@ -9,38 +9,38 @@ import '../../lib/lodash-init';
 import _ from "lodash";
 import Device from '../../lib/device';
 import * as echarts from '../../lib/echarts.min';
-let charter = {};
+let charterArr = {};
 
 function ecAInstance(canvas, width, height, dpr) {
-    charter.a = echarts.init(canvas, null, {
+    charterArr.a = echarts.init(canvas, null, {
         width: width,
         height: height,
         devicePixelRatio: dpr // 像素
     });
-    canvas.setChart(charter.a);
+    canvas.setChart(charterArr.a);
 
     var option = getHalfWaveChartsOpt();
-    charter.a.setOption(option);
-    return charter.a;
+    charterArr.a.setOption(option);
+    return charterArr.a;
 }
 
 function ecBInstance(canvas, width, height, dpr) {
-    charter.b = echarts.init(canvas, null, {
+    charterArr.b = echarts.init(canvas, null, {
         width: width,
         height: height,
         devicePixelRatio: dpr // 像素
     });
-    canvas.setChart(charter.b);
+    canvas.setChart(charterArr.b);
 
     var option = getHalfWaveChartsOpt();
-    charter.b.setOption(option);
-    return charter.b;
+    charterArr.b.setOption(option);
+    return charterArr.b;
 }
 
 function getHalfWaveChartsOpt() {
     let tmp = cons.getWaveChartsOpt();
-    tmp.legend.data[0].textStyle.fontSize = 8;
-    tmp.legend.data[1].textStyle.fontSize = 8;
+    tmp.legend.data[0].textStyle.fontSize = 9;
+    tmp.legend.data[1].textStyle.fontSize = 9;
     return tmp;
 }
 
@@ -78,10 +78,6 @@ Component({
         waveId: {
             type: String,
             value: '',
-        },
-        edtChannel: {
-            type: String,
-            value: null,
         }
     },
 
@@ -100,8 +96,6 @@ Component({
         hzGradientArr: ["高 -> 低", "低 -> 高"],
         aChannelEnable: true, // A通道启用
         bChannelEnable: true, // B通道启用
-        waveAChartsOpt: getHalfWaveChartsOpt(), // A通道波形图参数
-        waveBChartsOpt: getHalfWaveChartsOpt(), // B通道波形图参数
         pw: { // 电源强度
             a: 0,
             b: 0
@@ -109,60 +103,6 @@ Component({
         wave: {
             channelType: '0' // 通道类型 0-单通道 1-双通道
         },
-        // wave:{
-        //     name: "潮汐",
-        //     author: "XuDL",
-        //     channelType: '0', // 通道类型 0-单通道 1-双通道
-        //     stages: [{ // 小节数据
-        //         pw: 0, // 电源增量
-        //         hzType: 1, //0-固定 1-节内渐变 2-元间渐变 3-元内渐变
-        //         hz: [10, 300],
-        //         hzGradient: 0, // 渐变类型 0:高 -> 低 1:低 -> 高
-        //         times: 1,
-        //         metas: [{
-        //             z: 0
-        //         }, {
-        //             z: 5
-        //         }, {
-        //             z: 10
-        //         }, {
-        //             z: 15
-        //         }, {
-        //             z: 20
-        //         }, {
-        //             z: 25
-        //         }, {
-        //             z: 30
-        //         }, {
-        //             z: 29
-        //         }, {
-        //             z: 28
-        //         }, {
-        //             z: 27
-        //         }, {
-        //             z: 26
-        //         }]
-        //     }]
-        // },
-        // wave: {
-        //     id:"12321asdasdsa",
-        //     name: "持续",
-        //     author: "XuDL",
-        //     channelType: '1', // 通道类型 0-单通道 1-双通道
-        //     a: {
-        //         enabled: true,
-        //         stages: [{ // 小节数据
-        //             pw: 0, // 电源增量
-        //             hzType: 0, //0-固定 1-节内渐变 2-元间渐变 3-元内渐变
-        //             hz: 100, // 频率
-        //             times: 10, // 小节时长
-        //             metas: [{ // 元振幅
-        //                 z: 31
-        //             }],
-        //             restTimes: 5 // 休息时长 单位0.1
-        //         }]
-        //     }
-        // }
         showXyzImport: false, // 是否显示对话框
         xyzImpData: "", // xyz格式的import数据
         visibleHeight: '',
@@ -191,16 +131,22 @@ Component({
             // 设置 电源改变回调函数
             this._device.setPwChangedFunc('b', this.setPwChangedFunc, this);
             // 校验通道是否正在执行
-            if (this.data.edtChannel) {
-                if (this._device.isRunning(this.data.edtChannel)) {
-                    this._device.set
-                }
+            let isRunning = this._device.isRunning('a') || this._device.isRunning('b');
+            if (isRunning) {
+                // 如果正在播放就需要把当前播放状态改成正在播放
+                this.setData({
+                    isPlaying: true
+                });
             }
+            // 设置成编辑器模式
+            this._device.setEditing(true);
 
             // 读取电源强度缓存
             this.getPw();
         },
         hide: function () {
+            // 关闭编辑器模式
+            this._device.setEditing(false);
             this.clearCharts();
         }
     },
@@ -219,6 +165,20 @@ Component({
             //console.log(data);
         },
         ready: function () {
+            // 图像起始值
+            this._chartsCnt = {
+                'a': 0,
+                'b': 0
+            };
+            this._waveChartsData = {
+                'a': [],
+                'b': []
+            };
+            this._pwChartsData = {
+                'a': [],
+                'b': []
+            };
+
             this.getPlayerHeight();
             // 在组件实例进入页面节点树时执行
             let waveId = this.data.waveId;
@@ -247,44 +207,74 @@ Component({
      * 组件的方法列表
      */
     methods: {
-        sendedData(song, time, channel) {
-            this.writeCharts(channel, song, time);
+        sendedData(song, time, charts, channel) {
+            // 必须打开图像才会显示
+            if (!this.data.isShowChart) {
+                return;
+            }
+            this.writeCharts(channel, song, time, charts);
         },
         setPwChangedFunc(ap, bp) {
 
         },
-        writeCharts(channel, song, time) {
+        writeCharts(channel, song, time, charts) {
+            // 返回的图像必须要有值
+            if (!(charts && charts.length > 0)) {
+                return;
+            }
+            let charter = charterArr[channel];
+            if (!charter) {
+                return;
+            }
+            let chartsCnt = this._chartsCnt[channel];
+            let waveChartsData = this._waveChartsData[channel];
+            let pwChartsData = this._pwChartsData[channel];
+
+            chartsCnt += 10;
+
             // (x + y) / 100 = 波形数据在100毫秒内会创建几次脉冲
             // let pulseCnt = parseInt((song.x || 0) + (song.y) / 100);
-            if (!this._pwChartsData[channel]) {
-                this._pwChartsData[channel] = [];
+            if (!pwChartsData) {
+                pwChartsData = [];
             }
-            if (!this._waveChartsData[channel]) {
-                this._waveChartsData[channel] = [];
+            if (!waveChartsData) {
+                waveChartsData = [];
             }
-            // 计算0.1秒 100毫秒内一共有多少次脉冲图像
-            for (let t = 0; t < 100; t++) {
-                let dt = time + t;
-                if (0 == (t % song.y)) {
-                    for (let i = 0; i < song.x; i++) {
-                        dt = dt + i;
-                        // 电源强度
-                        this._pwChartsData[channel].push([dt, this.data.pw[channel]]);
-                        if (this._pwChartsData[channel].length > 100) {
-                            this._pwChartsData[channel].shift();
-                        }
-                        // 波形数据
-                        this._waveChartsData[channel].push([dt, song.z]);
-                        if (this._waveChartsData[channel].length > 100) {
-                            this._waveChartsData[channel].shift();
-                        }
-                    }
+            // console.log("charts", JSON.stringify(charts));
+            let tmpLst = [];
+            for (let i = 0; i < 10; i++) {
+                tmpLst.push([chartsCnt + i, charts[i]]);
+            }
+            pwChartsData.push([chartsCnt, this._device.getPw(channel)]);
+            console.log("song with charts", JSON.stringify(tmpLst));
+            waveChartsData = waveChartsData.concat(tmpLst);
+            // 最大显示数据
+            waveChartsData = _.takeRight(waveChartsData, 300);
+            pwChartsData = _.takeRight(pwChartsData, 30);
+            // 如果电源强度达到最大值，最小的和最大的时间要设置和波形相同
+            if (pwChartsData.length === 30) {
+                _.first(pwChartsData)[0] = _.first(waveChartsData)[0];
+                _.last(pwChartsData)[0] = _.last(waveChartsData)[0];
+            }
+
+            if (!charter) {
+                return;
+            }
+            // 动态设置最小值
+            let min = _.first(waveChartsData)[0];
+            charter.setOption({
+                xAxis: {
+                    min: min,
+                    max: min + 300
                 }
-            }
-            this.setCharts(channel, this._waveChartsData[channel], this._pwChartsData[channel]);
+            });
+            this.setCharts(channel, waveChartsData, pwChartsData);
+            this._chartsCnt[channel] = chartsCnt;
+            this._waveChartsData[channel] = waveChartsData;
+            this._pwChartsData[channel] = pwChartsData;
         },
         setCharts(channel, waveChartsData, pwChartsData) {
-            let chartCmp = charter[channel];
+            let chartCmp = charterArr[channel];
             if (chartCmp) {
                 chartCmp.setOption({
                     series: [{
@@ -297,23 +287,20 @@ Component({
         },
         clearCharts() {
             // 清空图像
-            // this._waveChartsData = {
-            //     a: [],
-            //     b: []
-            // };
-            // this._pwChartsData = {
-            //     a: [],
-            //     b: []
-            // };
-            if (this.waveACharter) {
-                this.setCharts('a', [], []);
-                this.waveACharter = null;
-
-            }
-            if (this.waveBCharter) {
-                this.setCharts('b', [], []);
-                this.waveBCharter = null;
-            }
+            this._chartsCnt = {
+                'a': 0,
+                'b': 0
+            };
+            this._waveChartsData = {
+                'a': [],
+                'b': []
+            };
+            this._pwChartsData = {
+                'a': [],
+                'b': []
+            };
+            this.setCharts('a', [], []);
+            this.setCharts('b', [], []);
         },
         getPw() {
             // 读取电量
@@ -395,7 +382,6 @@ Component({
             }
         },
         getPlayerHeight() {
-
             // 当前显示的高度
             this.setData({
                 visibleHeight: wx.getSystemInfoSync().windowHeight + 'px'
@@ -411,6 +397,15 @@ Component({
         },
         togglePlaying(e) {
             let isPlaying = this.data.isPlaying;
+            let msg1 = this._device.togglePlay('a');
+            if (msg1) {
+                Toast.fail(msg1);
+            }
+            let msg2 = this._device.togglePlay('b');
+            if (msg2) {
+                Toast.fail(msg2);
+                return;
+            }
             this.setData({
                 isPlaying: !isPlaying
             });

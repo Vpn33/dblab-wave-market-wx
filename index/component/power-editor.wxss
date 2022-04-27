@@ -34,7 +34,7 @@
 
 
 .player-item .meta-item {
-    width: 1.5rem;
+    width: 2.8rem;
     height: 100%;
     padding: 0px 2px;
     display: inline-block;

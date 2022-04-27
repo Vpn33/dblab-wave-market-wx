@@ -40,15 +40,19 @@ Component({
         },
         activeIdx: {
             type: Number,
-            value: null
+            value: -1
         },
         type: { // 默认是波形列表  power是电源方案列表
             type: String,
             value: null
         },
-        beforeEditor: { //打开editor的回调
+        beforeToolClick: { // 点击工具按钮的前置回调 如果返回false不会继续执行
             type: Function,
             value: null
+        },
+        toolBtn: {
+            type: Object,
+            value: {}
         }
     },
 
@@ -58,7 +62,23 @@ Component({
     data: {
 
     },
+    pageLifetimes: {
+        show: function () {
+            let toolBtn = Object.assign({
+                toTop: true,
+                toUp: true,
+                toDown: true,
+                toEditor: true,
+                toDelete: true
+            }, this.data.toolBtn);
+            this.setData({
+                toolBtn
+            });
+        },
+        hide: function () {
 
+        }
+    },
     /**
      * 组件的方法列表
      */
@@ -66,6 +86,12 @@ Component({
         toTop(e) {
             let idx = e.target.dataset['idx'];
             let list = this.data.playList || [];
+            if (this.data.beforeToolClick) {
+                let res = this.data.beforeToolClick('toTop', idx, list[idx]);
+                if (res === false) {
+                    return;
+                }
+            }
             // 已经是第一个不用动
             if (idx <= 0) {
                 return;
@@ -80,6 +106,12 @@ Component({
         toUp(e) {
             let idx = e.target.dataset['idx'];
             let list = this.data.playList || [];
+            if (this.data.beforeToolClick) {
+                let res = this.data.beforeToolClick('toUp', idx, list[idx]);
+                if (res === false) {
+                    return;
+                }
+            }
             // 已经是第一个不用动
             if (idx <= 0) {
                 return;
@@ -96,6 +128,12 @@ Component({
         toDown(e) {
             let idx = e.target.dataset['idx'];
             let list = this.data.playList || [];
+            if (this.data.beforeToolClick) {
+                let res = this.data.beforeToolClick('toDown', idx, list[idx]);
+                if (res === false) {
+                    return;
+                }
+            }
             // 已经是最后一个不用动
             if (idx == this.data.playList.length - 1) {
                 return;
@@ -112,22 +150,33 @@ Component({
         },
         toEditor: function (e) {
             let idx = e.target.dataset['idx'];
-            this.triggerEvent('beforeEditor', idx);
-            // setTimeout(() => {
-                if (this.data.type === 'power') {
-                    wx.navigateTo({
-                        url: 'component/power-editor?powerId=' + this.data.playList[idx].id
-                    });
-                } else {
-                    wx.navigateTo({
-                        url: 'component/wave-editor?waveId=' + this.data.playList[idx].id,
-                    });
+            if (this.data.beforeToolClick) {
+                let res = this.data.beforeToolClick('toEditor', idx, this.data.playList[idx]);
+                if (res === false) {
+                    return;
                 }
+            }
+            // setTimeout(() => {
+            if (this.data.type === 'power') {
+                wx.navigateTo({
+                    url: 'component/power-editor?powerId=' + this.data.playList[idx].id
+                });
+            } else {
+                wx.navigateTo({
+                    url: 'component/wave-editor?waveId=' + this.data.playList[idx].id,
+                });
+            }
             // }, 5000);
         },
         toDelete(e) {
             let idx = e.target.dataset['idx'];
             let list = this.data.playList || [];
+            if (this.data.beforeToolClick) {
+                let res = this.data.beforeToolClick('toDelete', idx, list[idx]);
+                if (res === false) {
+                    return;
+                }
+            }
             list.splice(idx, 1);
 
             this.setData({

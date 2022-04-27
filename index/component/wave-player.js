@@ -20,6 +20,7 @@ function ecInstance(canvas, width, height, dpr) {
     charter.setOption(option);
     return charter;
 }
+
 Component({
     /**
      * 组件的属性列表
@@ -54,9 +55,15 @@ Component({
         }],
         player: {}, // 播放器对象
         powerList: [], // 电源方案列表
-        powerCaseIdx: null, // 电源方案选中下标
+        powerCaseIdx: -1, // 电源方案选中下标
         ecInstance: {
             onInit: ecInstance
+        },
+        pwCaseBtns: {
+            toTop: false,
+            toUp: false,
+            toDown: false,
+            toDelete: false
         }
     },
     pageLifetimes: {
@@ -82,56 +89,66 @@ Component({
     },
     lifetimes: {
         ready: function () {
-            let data = ["000010100000110110000001",
-            "000010100000110110000001",
-            "000010100000110110000001",
-            "000010100000110110000001",
-            "000010100000110110000001",
-            "000010100000110110000001",
-            "000010100000110110000001",
-            "000010100000110110000001",
-            "000010100000110110000001",
-            "000010100000110110000001",
-            "000010100000110110000001"
-            ];
-            let waveData = wa.binary2WaveData(data);
-            console.log("waveData = ", JSON.stringify(waveData, null, 2));
-            // data = ["000010100000000100100001",
-            //     "000010100000000100100001",
-            //     "000010100000000100100001",
-            //     "000010100000000100100001",
-            //     "000010100000000100100001",
-            //     "000010100000000100100001",
-            //     "000010100000000100100001",
-            //     "000010100000000100100001",
-            //     "000010100000110100000101",
-            //     "000010100000101100000100",
-            //     "000010100000100101000100"
-            // ];
-            // waveData = wa.binary2WaveData(data);
-            // console.log("waveData = ", JSON.stringify(waveData));
+            let that = this;
+            this.setData({
+                beforeEditor: function (type, idx, item) {
+                    // 如果点击了删除 就必须校验是否正在播放中
+                    if (type === 'toDelete') {
+                        // 如果正在播放 提示需要停止播放再进行切换
+                        let playInfo = that._device.getPlayingInfo(that.data.channel);
+                        if (playInfo && playInfo.waveId === item.id) {
+                            Dialog.alert({
+                                context: that,
+                                message: item.name + '正在播放中，不能删除',
+                            });
+                            return false;
+                        }
+                    }
+                    let data = {};
+                    data['player.activeIdx'] = idx;
+                    that.setData(data);
+                    that.savePlayer();
+                    console.log("beforeEditor", that, type, idx, item);
+                }
+            });
+            // 图像起始值
+            this.chartsCnt = 0;
         },
     },
     /**
      * 组件的方法列表
      */
     methods: {
+        test(a, b) {
+            let pow = Math.pow(10.0, (b * 2.5) + 0.5);
+            if (pow < 10) {
+                pow = 10;
+            }
+            let pow2 = 20.0 - (Math.pow(Math.abs((a * 2) - 1), 1.65) * 20.0);
+            let pow3 = parseInt(Math.pow(pow / 1000, 0.5) * 8.0);
+            if (pow3 < 1) {
+                pow3 = 1;
+            }
+            let i2 = parseInt(pow - parseInt(pow3));
+            let i3 = parseInt(pow2);
+            return [pow3, i2, i3];
+        },
         closePlay() {
             this.setData({
                 playing: false
             });
             // this.clearCharts();
-            // // 重新绘图
+            // 重新绘图
             // if (charter) {
             //     var option = cons.getWaveChartsOpt();
             //     charter.clear();
             //     charter.setOption(option, false);
             // }
         },
-        beforeEditor() {
-            // 跳转前如果开启了 就关闭图像
-
-        },
+        // beforeEditor(type, idx, item) {
+        //     // 跳转前如果开启了 就关闭图像
+        //     console.log(type, idx, item);
+        // },
         // 电源通过播放或自动改变的回调
         pwChangedData(ap, bp) {
             let p = ap;
@@ -144,13 +161,17 @@ Component({
             // this.writePwCharts();
         },
         // 发送数据后的回调
-        sendedData(song, datetime) {
-            // 发送数据后画波形图
-            this.writeCharts(song, datetime);
+        sendedData(song, datetime, charts) {
+            // 如果没有打开图像开关则不显示
+            if (!this.data.showCharts) {
+                return;
+            }
+            // 画波形图 
+            this.writeCharts(song, datetime, charts);
         },
         choosePower() {
             // 如果正在播放 提示需要停止播放再进行切换
-            if (this._device.isRunning) {
+            if (this._device.isRunning(this.data.channel)) {
                 Dialog.alert({
                     context: this,
                     message: '请先停止' + (this.data.channel || "").toUpperCase() + '通道播放,再选择自动强度方案',
@@ -191,7 +212,7 @@ Component({
                     this.setData({
                         powerList
                     });
-                    if (this.data.player.autoPwCase && this.data.player.autoPwCase.id) {
+                    if (this.data.player.autoPwEnabled && this.data.player.autoPwCase.id) {
                         // 如果缓存的方案在方案列表中不存在了 需要删除缓存中的
                         let caseIdx = _.findIndex(powerList, {
                             'id': this.data.player.autoPwCase.id
@@ -219,6 +240,7 @@ Component({
                 // 设置播放器对象
                 this._device.setPlayer(this.data.channel, this.data.player);
             }
+
             // 设置发送数据的回调函数
             this._device.setSendedFunc(this.data.channel, this.sendedData, this);
             // 设置 电源改变回调函数
@@ -236,7 +258,7 @@ Component({
             let idx = this.getWaveIdx(wave.id);
             if (idx > -1) {
                 let data = {};
-                data['player.playingIdx'] = idx;
+                data['player.activeIdx'] = idx;
                 // 刷新下标
                 this.setData(data);
             }
@@ -279,7 +301,7 @@ Component({
         showAutoPwTypeHelp() {
             Dialog.alert({
                 context: this,
-                message: '往复-[1,2,3][3,2,1][1,2,3][3,2,1]...\n 顺序-[1,2,3] \n 循环-[1,2,3][1,2,3][1,2,3]... \n 随机-[1,3,2][1,1,3][2,3,1]...',
+                message: '往复-[1,2,3][2,1][2,3][2,1]...\n 顺序-[1,2,3] \n 循环-[1,2,3][1,2,3][1,2,3]... \n 随机-[1,3,2][1,1,3][2,3,1]...',
             });
         },
         showAutoPwInvHelp() {
@@ -346,9 +368,9 @@ Component({
         },
         clearCharts() {
             // 清空图像
+            this.chartsCnt = 0;
             this.waveChartsData = [];
             this.pwChartsData = [];
-            this._preY = 0;
             this.setCharts(this.waveChartsData, this.pwChartsData);
         },
         setCharts(waveChartsData, pwChartsData) {
@@ -362,7 +384,13 @@ Component({
                 });
             }
         },
-        writeCharts(song, time) {
+
+        writeCharts(song, time, charts) {
+            // 返回的图像必须要有值
+            if (!(charts && charts.length > 0)) {
+                return;
+            }
+            this.chartsCnt += 10;
             // (x + y) / 100 = 波形数据在100毫秒内会创建几次脉冲
             // let pulseCnt = parseInt((song.x || 0) + (song.y) / 100);
             if (!this.pwChartsData) {
@@ -371,48 +399,85 @@ Component({
             if (!this.waveChartsData) {
                 this.waveChartsData = [];
             }
-            if (!this._preTime) {
-                this._preTime = time;
+            // console.log("charts", JSON.stringify(charts));
+            let tmpLst = [];
+            for (let i = 0; i < 10; i++) {
+                tmpLst.push([this.chartsCnt + i, charts[i]]);
             }
-
-            let dt = this._preTime;
-            if (100 - song.y >= 0) {
-                let runT = parseInt(100 / song.y);
-                let modT = parseInt(100 % song.y);
-                // 小于100毫秒内需要判断脉冲次数
-                for (let y = 0; y < runT; y++) {
-                    // 循环添加脉冲
-                    for (let i = 0; i < song.x; i++) {
-                        // console.log("dt = ", dt);
-                        // 波形数据
-                        this.waveChartsData.push([dt, song.z]);
-                        // 电源强度
-                        this.pwChartsData.push([dt, this.data.player.pw]);
-                        dt++;
-                    }
-                    dt += song.y;
-                }
-                // 还要加上余数的时间
-                dt += modT;
-                this._preTime = dt;
-            } else {
-                // 大于100毫秒的 直接添加设置下次波形开始时间
-                // 循环添加脉冲
-                for (let i = 0; i < song.x; i++) {
-                    // 波形数据
-                    this.waveChartsData.push([dt, song.z]);
-                    // 电源强度
-                    this.pwChartsData.push([dt, this.data.player.pw]);
-                    dt++;
-                }
-                this._preTime = dt + song.y;
-            }
+            this.pwChartsData.push([this.chartsCnt, this.data.player.pw]);
+            console.log("song with charts", JSON.stringify(tmpLst));
+            this.waveChartsData = this.waveChartsData.concat(tmpLst);
             // 最大显示数据
             this.waveChartsData = _.takeRight(this.waveChartsData, 300);
-            this.pwChartsData = _.takeRight(this.pwChartsData, 300);
+            this.pwChartsData = _.takeRight(this.pwChartsData, 30);
+            // 如果电源强度达到最大值，最小的和最大的时间要设置和波形相同
+            if (this.pwChartsData.length === 30) {
+                _.first(this.pwChartsData)[0] = _.first(this.waveChartsData)[0];
+                _.last(this.pwChartsData)[0] = _.last(this.waveChartsData)[0];
+            }
+            if (!charter) {
+                return;
+            }
+            // 动态设置最小值
+            let min = _.first(this.waveChartsData)[0];
+            charter.setOption({
+                xAxis: {
+                    min: min,
+                    max: min + 300
+                }
+            });
             this.setCharts(this.waveChartsData, this.pwChartsData);
-
         },
+        // writeCharts(song, time) {
+        //     // (x + y) / 100 = 波形数据在100毫秒内会创建几次脉冲
+        //     // let pulseCnt = parseInt((song.x || 0) + (song.y) / 100);
+        //     if (!this.pwChartsData) {
+        //         this.pwChartsData = [];
+        //     }
+        //     if (!this.waveChartsData) {
+        //         this.waveChartsData = [];
+        //     }
+        //     if (!this._preTime) {
+        //         this._preTime = time;
+        //     }
+
+        //     let dt = this._preTime;
+        //     if (100 - song.y >= 0) {
+        //         let runT = parseInt(100 / song.y);
+        //         let modT = parseInt(100 % song.y);
+        //         // 小于100毫秒内需要判断脉冲次数
+        //         for (let y = 0; y < runT; y++) {
+        //             // 循环添加脉冲
+        //             for (let i = 0; i < song.x; i++) {
+        //                 // console.log("dt = ", dt);
+        //                 // 波形数据
+        //                 this.waveChartsData.push([dt, song.z]);
+        //                 // 电源强度
+        //                 this.pwChartsData.push([dt, this.data.player.pw]);
+        //                 dt++;
+        //             }
+        //             dt += song.y;
+        //         }
+        //         // 还要加上余数的时间
+        //         dt += modT;
+        //         this._preTime = dt;
+        //     } else {
+        //         // 大于100毫秒的 直接添加设置下次波形开始时间
+        //         // 循环添加脉冲
+        //         for (let i = 0; i < song.x; i++) {
+        //             // 波形数据
+        //             this.waveChartsData.push([dt, song.z]);
+        //             // 电源强度
+        //             this.pwChartsData.push([dt, this.data.player.pw]);
+        //             dt++;
+        //         }
+        //         this._preTime = dt + song.y;
+        //     }
+        //     // 最大显示数据
+        //     this.waveChartsData = _.takeRight(this.waveChartsData, 300);
+        //     this.pwChartsData = _.takeRight(this.pwChartsData, 300);
+        //     this.setCharts(this.waveChartsData, this.pwChartsData);
+        // },
         subAp() {
             this._device.addPw(this.data.channel, -1);
         },
@@ -464,20 +529,27 @@ Component({
             this.savePlayer();
         },
         onAutoPwChange(e) {
-            // 自动强度改变
+            // 自动强度开关改变
+            let data = {};
+            if (e.detail === false) {
+                // 删除电源方案
+                this._device.setAutoPwCase(null);
+                data['powerCaseIdx'] = -1;
+                data['player.autoPwCase'] = null;
+            }
+            data['player.autoPwEnabled'] = e.detail
             this._device.setAutoPwEnabled(this.data.channel, e.detail);
-            this.setData({
-                'player.autoPwEnabled': e.detail
-            });
+            this.setData(data);
             // 保存播放器数据到缓存
             this.savePlayer();
         },
         onAutoPwTypeChange(e) {
             // 自动强度类型改变
+            let data = {};
+            data['player.autoPwType'] = e.detail;
+            // 设置播放器的自动强度类型
             this._device.setAutoPwType(this.data.channel, e.detail);
-            this.setData({
-                'player.autoPwType': e.detail
-            });
+            this.setData(data);
             // 保存播放器数据到缓存
             this.savePlayer();
         },
@@ -495,21 +567,23 @@ Component({
             let cha = this.data.channel;
             let tar = e.detail.data || {};
             let npc = this.data.player.autoPwCase || {};
+            let data = {};
             // 点击的方案和当前选择的的不一样再切换
             if (tar.id != npc.id) {
-                let data = {};
                 data['powerCaseIdx'] = e.detail.index;
                 data['player.autoPwCase'] = tar;
-                data['showChoosePower'] = false;
+
                 // 切换电源方案
                 let msg = this._device.setAutoPwCase(cha, tar);
                 if (msg) {
                     Toast.fail(msg);
                 }
-                this.setData(data);
-                // 保存播放器数据到缓存
-                this.savePlayer();
+
             }
+            data['showChoosePower'] = false;
+            this.setData(data);
+            // 保存播放器数据到缓存
+            this.savePlayer();
         },
         onMinTimeChange(e) {
             // 最小播放时长改变
@@ -597,41 +671,57 @@ Component({
             // 播放列表修改要存储
             let data = {};
             data['playList'] = e.detail || [];
-            let playing = this._device.getPlayingInfo(this.data.channel);
-            this.getWaveIdx()
             this._device.setPlayList(this.data.channel, data.playList);
             this.setData(data);
             // 写入文件
             wa.writePlayList(this.data.channel, this.data.playList);
+        },
+        onPowerCaseChange(e) {
+            // 电源方案修改要存储
         },
         onPlayWaveClick(e) {
             // console.log("onPlayWaveClick", e);
             let cha = this.data.channel;
             let tar = e.detail;
             let idx = tar.index;
-            let nDx = this._device.getPlayingIdx(cha);
-            // 点击的波形和当前播放的不一样再切换
-            if (idx != nDx) {
-                let data = {};
-                data['player.playingIdx'] = idx;
-                this.setData(data);
-                // 如果正在播放
-                if (this._device.isRunning(cha)) {
+            // 如果正在播放
+            if (this._device.isRunning(cha)) {
+                let nDx = this._device.getPlayingIdx(cha);
+                // 点击的波形和当前播放的不一样再切换
+                if (idx != nDx) {
                     // 切换波形
                     let msg = this._device.changePlay(cha, idx);
                     if (msg) {
                         Toast.fail(msg);
                     }
-                } else {
-                    // 设置索引
-                    this._device.setPlayingIdx(cha, idx);
                 }
             }
+            let data = {};
+            data['player.activeIdx'] = idx;
+            this.setData(data);
         },
         togglePlay(e) {
             // 播放通道
             let cha = e.target.dataset['channel'];
             let pl = this.data.playing;
+            // 如果有自动强度 要刷新方案
+            if (this.data.player.autoPwCase && this.data.player.autoPwCase.id) {
+                // 如果电源方案存在 就要设置选中的下标
+                if (this.data.powerList && this.data.powerList.length > 0 && this.data.powerCaseIdx) {
+                    this.setData({
+                        'player.autoPwCase': this.data.powerList[this.data.powerCaseIdx], // 同时刷新一下缓存中的电源方案 避免修改后依然读取缓存的
+                    });
+                } else if (this.data.powerList.length <= 0) {
+                    // 如果电源列表为 说明一个方案都没有 要清除方案
+                    this.setData({
+                        'player.autoPwCase': null,
+                        'powerCaseIdx': -1
+                    });
+                }
+
+            }
+            // 设置播放索引和点击的索引一致
+            this._device.setPlayingIdx(cha, this.data.player.activeIdx);
             let msg = this._device.togglePlay(cha);
             if (msg) {
                 Toast.fail(msg);
@@ -640,6 +730,7 @@ Component({
             this.setData({
                 playing: !pl
             });
+            if (this.data.playing === false) {}
             // if (this.data.playing === false) {
             //     var option = cons.getWaveChartsOpt();
             //     charter.clear();

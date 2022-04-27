@@ -4,8 +4,6 @@
         "channel-wave-edt": "./channel-wave-edt",
         "ec-canvas": "./ec-canvas/ec-canvas",
         "van-button": "@vant/weapp/button/index",
-        "van-row": "@vant/weapp/row/index",
-        "van-col": "@vant/weapp/col/index",
         "van-slider": "@vant/weapp/slider/index",
         "van-icon": "@vant/weapp/icon/index",
         "van-dialog": "@vant/weapp/dialog/index",

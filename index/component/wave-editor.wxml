@@ -7,9 +7,9 @@
             <van-icon name="arrow-up" bindtap="onDelStage" data-stage-idx="{{sIdx}}" />
         </view> -->
         <view>
-            <van-row class="wave-player-channeles">
-                <van-col span="12">
-                    <view class="wave-player-channel">
+            <view class="wave-player-channeles">
+                <view class="wave-player-channel">
+                    <view class="wave-player-head">
                         <view class="channel-name"><text>A通道</text></view>
                         <view class="channel-pw">
                             <view class="channel-pw-text"><text>电源强度</text></view>
@@ -17,26 +17,24 @@
                                 <van-stepper value="{{ pw.a }}" min="0" max="2047" bind:change="onPlayerPwChange" data-channel-name="a" />
                             </view>
                         </view>
-                        <view class="play-wave-charts" wx:if="{{isShowChart}}">
-                            <ec-canvas id="channel-a-dom-bar" force-use-old-canvas="true" canvas-id="channel-a-chart" ec="{{ ecAInstance }}"></ec-canvas>
+                    </view>
+                    <view class="play-wave-charts" wx:if="{{isShowChart}}">
+                        <ec-canvas id="channel-a-dom-bar" force-use-old-canvas="true" canvas-id="channel-a-chart" ec="{{ ecAInstance }}"></ec-canvas>
+                    </view>
+                </view>
+                <view class="wave-player-channel">
+                    <view class="channel-name"><text>B通道</text></view>
+                    <view class="channel-pw">
+                        <view class="channel-pw-text"><text>电源强度</text></view>
+                        <view class="channel-pw-btn">
+                            <van-stepper value="{{ pw.b }}" min="0" max="2047" bind:change="onPlayerPwChange" data-channel-name="b" />
                         </view>
                     </view>
-                </van-col>
-                <van-col span="12">
-                    <view class="wave-player-channel">
-                        <view class="channel-name"><text>B通道</text></view>
-                        <view class="channel-pw">
-                            <view class="channel-pw-text"><text>电源强度</text></view>
-                            <view class="channel-pw-btn">
-                                <van-stepper value="{{ pw.b }}" min="0" max="2047" bind:change="onPlayerPwChange" data-channel-name="b" />
-                            </view>
-                        </view>
-                        <view class="play-wave-charts" wx:if="{{isShowChart}}">
-                            <ec-canvas id="channel-b-dom-bar" force-use-old-canvas="true" canvas-id="channel-b-chart" ec="{{ ecBInstance }}"></ec-canvas>
-                        </view>
+                    <view class="play-wave-charts" wx:if="{{isShowChart}}">
+                        <ec-canvas id="channel-b-dom-bar" force-use-old-canvas="true" canvas-id="channel-b-chart" ec="{{ ecBInstance }}"></ec-canvas>
                     </view>
-                </van-col>
-            </van-row>
+                </view>
+            </view>
         </view>
         <view class="player-btns">
             <van-button type="primary" class="player-btn" bindtap="toggleCharts" wx:if="{{!isShowChart}}">

@@ -50,21 +50,21 @@
                         </a><text>：{{ tools.stringify(s.hz) }}</text>
                     </view>
                     <view class="item-tools">
-                        <van-button type="info" size="mini" type="default" bindtap="hzTypeChange" data-stage-idx="{{sIdx}}">{{hzTypeArr[s.hzType]}}</van-button>
+                        <van-button type="info" size="mini" type="default" bindtap="hzTypeChange" data-stage-idx="{{sIdx}}">{{hzTypeArr[s.hzType - 1]}}</van-button>
                     </view>
                 </view>
-                <view class="hz-range-silder" wx:if="{{s.hzType != 0}}">
-                    <!-- 官网给定理想Frequency范围为10-1000 此时效果最好-->
-                    <van-slider value="{{ s.hz }}" min="10" max="1000" step="10" range bind:drag="onHzDrag" data-stage-idx="{{sIdx}}">
+                <view class="hz-range-silder" wx:if="{{s.hzType != 1}}">
+                    <!-- 官网给定理想Frequency范围为10-1000 此时效果最好 -->
+                    <van-slider value="{{ s.hz }}" min="1" max="100" step="1" range bind:drag="onHzDrag" data-stage-idx="{{sIdx}}">
                     </van-slider>
                 </view>
-                <van-row gutter="10" wx:if="{{s.hzType == 0}}">
+                <van-row gutter="10" wx:if="{{s.hzType == 1}}">
                     <van-col span="5">
                         <van-button icon="minus" class="mini-btn" type="default" size="mini" bindtap="subAp" bindlongpress="subLongAp" bindtouchend="endSubLongAp" data-stage-idx="{{sIdx}}" ></van-button>
                     </van-col>
                     <van-col span="14">
                         <!-- 官网给定理想Frequency范围为10-1000 此时效果最好-->
-                        <van-slider class="player-pw-slider" binddrag="onHzDrag" min="10" max="1000" value="{{s.hz}}" data-stage-idx="{{sIdx}}" />
+                        <van-slider class="player-pw-slider" binddrag="onHzDrag" min="1" max="100" value="{{s.hz}}" data-stage-idx="{{sIdx}}" />
                     </van-col>
                     <van-col span="5" class="last-col">
                         <van-button icon="plus" class="mini-btn hz-add" type="default" size="mini" bindtap="addAp" bindlongpress="addLongAp" bindtouchend="endLongAp" data-stage-idx="{{sIdx}}" ></van-button>
@@ -73,21 +73,21 @@
             </view>
             <view class="player-item" wx:if="{{s.hzType != 0}}">
                 <view class="item-title">
-                    <view class="item-text">渐变类型 <a bindtap="showPwHelp">
+                    <view class="item-text">渐变类型 <a bindtap="showHzTypeHelp">
                             <van-icon name="question" />
                         </a><text>：{{ hzGradientArr[s.hzGradient] }}</text>
                     </view>
                     <view class="item-tools">
                         <view class="hz-gradient-btn">
-                            <van-icon class="hz-gradient" name="bar-chart-o" wx:if="{{s.hzGradient == 0}}" bindtap="hzGradientChange" data-stage-idx="{{sIdx}}" />
-                            <van-icon name="bar-chart-o" bindtap="hzGradientChange" wx:if="{{s.hzGradient == 1}}" data-stage-idx="{{sIdx}}" />
+                            <van-icon class="hz-gradient" name="bar-chart-o" wx:if="{{s.hzGradient == 1}}" bindtap="hzGradientChange" data-stage-idx="{{sIdx}}" />
+                            <van-icon name="bar-chart-o" bindtap="hzGradientChange" wx:if="{{s.hzGradient == 0}}" data-stage-idx="{{sIdx}}" />
                         </view>
                     </view>
                 </view>
             </view>
             <view class="player-item">
                 <view class="item-title">
-                    <view class="item-text">脉冲形状 <a bindtap="showPwHelp">
+                    <view class="item-text">脉冲形状 <a bindtap="showMetasHelp">
                             <van-icon name="question" />
                         </a><text>：{{tools.toFixed((s.metas.length || 0 ) * 0.1, 1)}} 秒</text></view>
                     <view class="item-tools">
@@ -101,14 +101,16 @@
                             <van-icon wx:if="{{mIdx > 0}}" name="cross" bindtap="subOneMeta" data-stage-idx="{{sIdx}}" data-meta-idx="{{mIdx}}" />
                         </view>
                         <view class="meta-item-slider">
-                            <van-slider min="0" max="31" value="{{tools.abs( m.z - 31)}}" data-stage-idx="{{sIdx}}" data-meta-idx="{{mIdx}}" vertical bind:change="onMetaZChange" active-color="#e5e5e5" inactive-color="#F9E49C" />
+                            <van-slider custom-class="meta-slider" min="0" max="31" value="{{tools.abs( m.z - 31)}}" data-stage-idx="{{sIdx}}" data-meta-idx="{{mIdx}}" vertical bind:drag="onMetaZChange" active-color="#e5e5e5" inactive-color="#F9E49C" use-button-slot>
+                                <view class="custom-button {{m.z > 20?'meta-warn':''}}" slot="button">{{ m.z }}</view>
+                            </van-slider>
                         </view>
                     </view>
                 </view>
             </view>
             <view class="player-item">
                 <view class="item-title">
-                    <view class="item-text">小节时长 <a bindtap="showPwHelp">
+                    <view class="item-text">小节时长 <a bindtap="showTimesHelp">
                             <van-icon name="question" />
                         </a><text>：{{ tools.toFixed( (s.times || 1) * (s.metas.length || 0 ) * 0.1, 1) }} 秒</text>
                     </view>
@@ -120,7 +122,7 @@
             </view>
             <view class="player-item">
                 <view class="item-title">
-                    <view class="item-text">休息时长 <a bindtap="showPwHelp">
+                    <view class="item-text">休息时长 <a bindtap="showRestTimesHelp">
                             <van-icon name="question" />
                         </a><text>：{{ tools.toFixed((s.restTimes || 0) * 0.1, 1) }} 秒</text>
                     </view>
@@ -128,9 +130,19 @@
                         <van-stepper value="{{ s.restTimes }}" min="0" bind:change="onRestTimeChange" data-stage-idx="{{sIdx}}" />
                     </view>
                 </view>
-
             </view>
-
+            <view class="player-item">
+                <view class="item-title">
+                    <view class="item-text">高低频平衡 <a bindtap="showBalanceHelp">
+                            <van-icon name="question" />
+                        </a><text>：{{ s.balance }}</text>
+                    </view>
+                    <view class="item-tools">
+                        <van-slider value="{{ s.balance }}" min="1" max="16" bind:drag="onBalanceDrag" data-stage-idx="{{sIdx}}">
+                    </van-slider>
+                    </view>
+                </view>
+            </view>
         </view>
         <view class="wave-stage add-stage">
             <van-icon class="wave-stage-add-btn" name="add-o" bindtap="createStage" />

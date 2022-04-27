@@ -191,3 +191,22 @@
 .stage-time-stepper .van-stepper__plus {
     height: var(--button-mini-height, 22px);
 }
+
+.custom-button {
+    background: #F9E49c;
+    color: black;
+    padding: 2px;
+    border-radius: var(--slider-button-border-radius, 50%);
+    box-shadow: var(--slider-button-box-shadow, 0 1px 2px rgba(0, 0, 0, .5));
+    height: var(--slider-button-height, 24px);
+    line-height: var(--slider-button-height, 24px);
+    width: var(--slider-button-width, 24px);
+    font-size: 0.5rem;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.custom-button.meta-warn{
+    background: red;
+    color: white;
+}

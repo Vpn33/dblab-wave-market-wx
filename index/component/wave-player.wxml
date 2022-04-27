@@ -4,7 +4,7 @@
 
     <view class="player-item">
         <view class="player-item play-wave-charts" wx:if="{{showCharts}}">
-            <ec-canvas id="mychart-dom-bar" canvas-id="mychart-bar" ec="{{ ecInstance }}"></ec-canvas>
+            <ec-canvas id="mychart-dom-bar" canvas-id="mychart-bar" ec="{{ ecInstance }}" ></ec-canvas>
         </view>
         <view class="player-item-btns">
             <view class="player-item-btns-text">
@@ -142,11 +142,11 @@
         <van-icon name="delete-o" />
     </view>
     <view class="player-item play-list h-scorller">
-        <play-list play-list="{{player.playList || []}}" active-idx="{{player.playingIdx}}" bind:clickItem="onPlayWaveClick" bind:change="onPlayListChange" bind:beforeEditor="beforeEditor"></play-list>
+        <play-list play-list="{{player.playList || []}}" active-idx="{{player.activeIdx}}" bind:clickItem="onPlayWaveClick" bind:change="onPlayListChange" before-tool-click="{{beforeEditor}}" data-beforeToolClick="{{beforeEditor}}"></play-list>
     </view>
     <van-popup show="{{ showChoosePower}}" bind:close="onCloseChoosePower" position="bottom">
-        <view class="pop-content h-scorller">
-            <play-list play-list="{{powerList|| []}}" active-idx="{{powerCaseIdx}}" type="power" bind:clickItem="onPowerCaseClick" bind:change="onPowerCaseChange"></play-list>
+        <view class="pop-content h-scorller" >
+            <play-list wx:if="{{ showChoosePower}}" play-list="{{powerList|| []}}" active-idx="{{powerCaseIdx}}" type="power" bind:clickItem="onPowerCaseClick" bind:change="onPowerCaseChange" toolBtn="{{pwCaseBtns}}"></play-list>
         </view>
     </van-popup>
     <van-dialog id="van-dialog" />

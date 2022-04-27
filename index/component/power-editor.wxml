@@ -10,7 +10,7 @@
                     <view class="item-title">
                         <view class="item-text"> 电源节点</view>
                         <view class="item-tools">
-                            <van-button icon="plus" class="mini-btn" size="mini" type="default" bindtap="addMeta"/>
+                            <van-button icon="plus" class="mini-btn" size="mini" type="default" bindtap="addMeta" />
                             <van-button icon="minus" class="mini-btn" size="mini" type="default" bindtap="subMeta" />
                         </view>
                     </view>
@@ -21,7 +21,7 @@
                             </view>
                             <view class="meta-item-slider">
                                 <van-slider min="-30" max="30" value="{{-m.z}}" data-meta-idx="{{mIdx}}" vertical bind:drag="onMetaZChange" active-color="#e5e5e5" inactive-color="#F9E49C" use-button-slot>
-                                    <view class="custom-button" slot="button">{{ m.z }}</view>
+                                    <view class="custom-button" slot="button">{{ m.z > 0? '+' + m.z:m.z }}</view>
                                 </van-slider>
                             </view>
                         </view>

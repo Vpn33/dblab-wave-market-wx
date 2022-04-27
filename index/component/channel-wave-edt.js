@@ -2,12 +2,14 @@
 import tools from '../../lib/tools';
 import cons from '../../lib/consts';
 import Dialog from '@vant/weapp/dialog/dialog';
+import '../../lib/lodash-init';
+import _ from "lodash";
 Component({
     /**
      * 组件的属性列表
      */
     properties: {
-        noChannel:{
+        noChannel: {
             type: Boolean,
             value: false,
         },
@@ -66,8 +68,9 @@ Component({
         // 颗粒摩擦 节内渐变 小节时长内每个振幅均匀根据频率渐变 
         // 挑逗1 元内渐变 一次完整的波形内频率渐变不管小节时长多少
         // 波浪涟漪 元间渐变 小节内的全部振幅作为整体(一次完整波形)根据时长渐变 
-        hzTypeArr: ["固定", "节内渐变", "元内渐变", "元间渐变"],
-        hzGradientArr: ["快 -> 慢", "慢 -> 快"],
+        // 1-固定 2-节间渐变 3-元内渐变 4-元间渐变 5-阶梯渐变 6-每节随机 7-每元随机
+        hzTypeArr: ["固定", "节内渐变", "元内渐变", "元间渐变", "阶梯渐变", "每节随机", "每元随机"],
+        hzGradientArr: ["频率: 小 -> 大", "频率: 大 -> 小"],
         channelEnable: true, // 通道启用
     },
     observers: {
@@ -99,6 +102,36 @@ Component({
             Dialog.alert({
                 context: this,
                 message: '脉冲频率值越低，实际感受到的越快。\n频率值越高，感受到的越慢。\n 频率类型说明↓ \n固定:小节内频率相同 \n节内渐变:小节时长内每个振幅均匀根据频率渐变 \n元内渐变:一次完整的波形内频率渐变不管小节时长多少 \n元间渐变:小节内的全部振幅作为整体(一次完整波形)根据时长渐变',
+            });
+        },
+        showHzTypeHelp() {
+            Dialog.alert({
+                context: this,
+                message: '点击切换频率的渐变类型，渐变的方向会带来不一样的效果。',
+            });
+        },
+        showMetasHelp() {
+            Dialog.alert({
+                context: this,
+                message: '脉冲形状是根据每个脉冲宽度进行生成的。脉冲越宽，感受就越强，反之脉冲越窄感受约越弱。当脉冲宽度大于20时，更容易引起刺痛。这里解封了在APP中被封印了20以上的脉冲宽度，谨慎合理的使用会带来更好的效果。（20以上会标记成红色，但不影响播放）',
+            });
+        },
+        showTimesHelp() {
+            Dialog.alert({
+                context: this,
+                message: '每个脉冲元会持续0.1秒。所有脉冲元的时间就是一个小节的时间。小节总时长 = 时长*(一个小节时间)',
+            });
+        },
+        showRestTimesHelp() {
+            Dialog.alert({
+                context: this,
+                message: '小节播放完毕会进入休息状态，若为0则会继续播放，若不为0则会暂停播放。',
+            });
+        },
+        showBalanceHelp() {
+            Dialog.alert({
+                context: this,
+                message: '滑块位于左侧高频更强，右侧低频更强。',
             });
         },
         channgeChannelWave() {
@@ -162,15 +195,23 @@ Component({
             let hzType = this.properties.channelWave.stages[idx].hzType;
             let hz = this.properties.channelWave.stages[idx].hz;
             let data = {};
-            if (hzType == 0) {
+            if (hzType == 1) {
                 // 如果从固定频率变成分段频率 要把hz修正成数组
-                data['channelWave.stages[' + idx + '].hz'] = [1, hz];
+                if (_.isArray(hz)) {
+                    data['channelWave.stages[' + idx + '].hz'] = hz;
+                } else {
+                    data['channelWave.stages[' + idx + '].hz'] = [1, hz];
+                }
             }
             hzType++;
-            if (hzType > 3) {
-                hzType = 0;
+            if (hzType > 4) {
+                hzType = 1;
                 // 如果从其他分段频率变成固定 要把hz修正成整数
-                data['channelWave.stages[' + idx + '].hz'] = hz[1];
+                if (_.isArray(hz)) {
+                    data['channelWave.stages[' + idx + '].hz'] = hz[1];
+                } else {
+                    data['channelWave.stages[' + idx + '].hz'] = hz;
+                }
             }
 
             data['channelWave.stages[' + idx + '].hzType'] = hzType;
@@ -189,6 +230,18 @@ Component({
             let data = {};
             hz = e.detail.value;
             data['channelWave.stages[' + idx + '].hz'] = hz;
+            this.setData(
+                data
+            );
+            this.channgeChannelWave();
+        },
+        onBalanceDrag(e) {
+            // 高低频平衡改变
+            let idx = e.target.dataset['stageIdx'];
+            let balance = this.properties.channelWave.stages[idx].balance;
+            let data = {};
+            balance = e.detail.value;
+            data['channelWave.stages[' + idx + '].balance'] = balance;
             this.setData(
                 data
             );
@@ -296,7 +349,7 @@ Component({
             let idx = e.target.dataset['stageIdx'];
             let mIdx = e.target.dataset['metaIdx'];
             let data = {};
-            let val = Math.abs(e.detail - 31);
+            let val = Math.abs(e.detail.value - 31);
 
             data['channelWave.stages[' + idx + '].metas[' + mIdx + '].z'] = val;
             this.setData(
