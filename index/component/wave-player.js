@@ -238,7 +238,8 @@ Component({
         },
         savePlayer() {
             // 保存播放器数据到缓存
-            wa.writePlayer(this.data.channel, this.data.player);
+            let sp = _.omit(this.data.player, ['pw']); // 不保存电源强度
+            wa.writePlayer(this.data.channel, sp);
         },
         init: function () {
             // 读取播放列表
@@ -289,6 +290,7 @@ Component({
             }
             // 设置波形默认选择
             this.setData({
+                'player.pw': this._device.getPw(this.data.channel),
                 'player.activeIdx': this._device.activeIdx
             });
             // 设置发送数据的回调函数

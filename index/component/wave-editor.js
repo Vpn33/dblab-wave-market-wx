@@ -242,6 +242,12 @@ Component({
         setPwChangedFunc(ap, bp) {
 
         },
+        onPlayerPwChange(e) {
+            // 电源强度改变
+            let pw = e.detail;
+            let channel = e.target.dataset['channelName'];
+            this._device.setPw(channel, pw);
+        },
         writeCharts(channel, song, time, charts) {
             // 返回的图像必须要有值
             if (!(charts && charts.length > 0)) {
