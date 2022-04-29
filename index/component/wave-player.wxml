@@ -4,7 +4,7 @@
 
     <view class="player-item">
         <view class="player-item play-wave-charts" wx:if="{{showCharts}}">
-            <ec-canvas id="mychart-dom-bar" canvas-id="mychart-bar" ec="{{ ecInstance }}" ></ec-canvas>
+            <ec-canvas id="mychart-dom-bar-{{channel}}" canvas-id="mychart-bar-{{channel}}" ec="{{ ecInstance }}" ></ec-canvas>
         </view>
         <view class="player-item-btns">
             <view class="player-item-btns-text">

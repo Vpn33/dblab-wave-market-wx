@@ -148,6 +148,16 @@ Component({
 
             this.triggerEvent('change', list);
         },
+        toMyWaveList: function () {
+            wx.switchTab({
+                url: 'my-wave-list'
+            });
+        },
+        toMyPowerList: function () {
+            wx.switchTab({
+                url: 'my-power-list'
+            });
+        },
         toEditor: function (e) {
             let idx = e.target.dataset['idx'];
             if (this.data.beforeToolClick) {

@@ -86,6 +86,10 @@ Page({
         this.setData({
           connState: 1
         });
+        if (this._device) {
+          // 设置非编辑器模式
+          this._device.setEditing(false);
+        }
         return;
       }
       // 打开蓝牙连接
@@ -97,6 +101,8 @@ Page({
         this.setData({
           battery
         });
+        // 设置非编辑器模式
+        this._device.setEditing(false);
       }
     }
   },
@@ -238,7 +244,7 @@ Page({
   },
   onChange(event) {
     this.setData({
-      activeNames: event.detail,
+      activeNames: event.detail.name,
     });
   },
   onAiAPChange(e) {

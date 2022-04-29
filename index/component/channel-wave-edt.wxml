@@ -71,7 +71,7 @@
                     </van-col>
                 </van-row>
             </view>
-            <view class="player-item" wx:if="{{s.hzType != 0}}">
+            <view class="player-item" wx:if="{{s.hzType != 1}}">
                 <view class="item-title">
                     <view class="item-text">渐变类型 <a bindtap="showHzTypeHelp">
                             <van-icon name="question" />

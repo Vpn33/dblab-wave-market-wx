@@ -9,32 +9,41 @@ import '../../lib/lodash-init';
 import _ from "lodash";
 import Device from '../../lib/device';
 import * as echarts from '../../lib/echarts.min';
-let charterArr = {};
 
 function ecAInstance(canvas, width, height, dpr) {
-    charterArr.a = echarts.init(canvas, null, {
+    // ready函数设置的comp就是组件对象
+    if (!this.setCharter) {
+        return;
+    }
+    let charter = echarts.init(canvas, null, {
         width: width,
         height: height,
         devicePixelRatio: dpr // 像素
     });
-    canvas.setChart(charterArr.a);
+    canvas.setChart(charter);
 
     var option = getHalfWaveChartsOpt();
-    charterArr.a.setOption(option);
-    return charterArr.a;
+    charter.setOption(option);
+    this.setCharter(charter);
+    return charter;
 }
 
 function ecBInstance(canvas, width, height, dpr) {
-    charterArr.b = echarts.init(canvas, null, {
+    // ready函数设置的comp就是组件对象
+    if (!this.setCharter) {
+        return;
+    }
+    let charter = echarts.init(canvas, null, {
         width: width,
         height: height,
         devicePixelRatio: dpr // 像素
     });
-    canvas.setChart(charterArr.b);
+    canvas.setChart(charter);
 
     var option = getHalfWaveChartsOpt();
-    charterArr.b.setOption(option);
-    return charterArr.b;
+    charter.setOption(option);
+    this.setCharter(charter);
+    return charter;
 }
 
 function getHalfWaveChartsOpt() {
@@ -121,6 +130,11 @@ Component({
             if (!this._device) {
                 this._device = getApp().blDevice;
             }
+            // 如果是编辑器模式 就不用再设置了
+            if (!this._device.isEditing()) {
+                // 如果不是就设置为编辑器模式 
+                this._device.setEditing(true);
+            }
             // 设置发送数据的回调函数
             this._device.setSendedFunc('a', this.sendedData, this);
             // 设置 电源改变回调函数
@@ -138,8 +152,6 @@ Component({
                     isPlaying: true
                 });
             }
-            // 设置成编辑器模式
-            this._device.setEditing(true);
 
             // 读取电源强度缓存
             this.getPw();
@@ -165,6 +177,19 @@ Component({
             //console.log(data);
         },
         ready: function () {
+            this._charter = {
+                a: null,
+                b: null
+            };
+            // echarts使用组件对象
+            this.setData({
+                'ecAInstance.setCharter': (charter) => {
+                    this._charter.a = charter;
+                },
+                'ecBInstance.setCharter': (charter) => {
+                    this._charter.b = charter;
+                },
+            });
             // 图像起始值
             this._chartsCnt = {
                 'a': 0,
@@ -222,7 +247,7 @@ Component({
             if (!(charts && charts.length > 0)) {
                 return;
             }
-            let charter = charterArr[channel];
+            let charter = this._charter[channel];
             if (!charter) {
                 return;
             }
@@ -243,29 +268,30 @@ Component({
             // console.log("charts", JSON.stringify(charts));
             let tmpLst = [];
             for (let i = 0; i < 10; i++) {
+                // 波形图像
                 tmpLst.push([chartsCnt + i, charts[i]]);
             }
+            // 电源图像
             pwChartsData.push([chartsCnt, this._device.getPw(channel)]);
-            console.log("song with charts", JSON.stringify(tmpLst));
+            // console.log("song with charts", JSON.stringify(tmpLst));
             waveChartsData = waveChartsData.concat(tmpLst);
             // 最大显示数据
-            waveChartsData = _.takeRight(waveChartsData, 300);
-            pwChartsData = _.takeRight(pwChartsData, 30);
-            // 如果电源强度达到最大值，最小的和最大的时间要设置和波形相同
-            if (pwChartsData.length === 30) {
-                _.first(pwChartsData)[0] = _.first(waveChartsData)[0];
-                _.last(pwChartsData)[0] = _.last(waveChartsData)[0];
-            }
+            waveChartsData = _.takeRight(waveChartsData, 200);
+            pwChartsData = _.takeRight(pwChartsData, 20);
 
             if (!charter) {
                 return;
             }
-            // 动态设置最小值
+            // 动态设置最小值和最大值
             let min = _.first(waveChartsData)[0];
+            let max = min + 200;
+            if (waveChartsData.length === 200) {
+                max = _.last(waveChartsData)[0];
+            }
             charter.setOption({
                 xAxis: {
-                    min: min,
-                    max: min + 300
+                    min,
+                    max
                 }
             });
             this.setCharts(channel, waveChartsData, pwChartsData);
@@ -274,7 +300,7 @@ Component({
             this._pwChartsData[channel] = pwChartsData;
         },
         setCharts(channel, waveChartsData, pwChartsData) {
-            let chartCmp = charterArr[channel];
+            let chartCmp = this._charter[channel];
             if (chartCmp) {
                 chartCmp.setOption({
                     series: [{
@@ -301,6 +327,16 @@ Component({
             };
             this.setCharts('a', [], []);
             this.setCharts('b', [], []);
+            if (this._charter.a) {
+                var option = cons.getWaveChartsOpt();
+                this._charter.a.clear();
+                this._charter.a.setOption(option, false);
+            }
+            if (this._charter.b) {
+                var option = cons.getWaveChartsOpt();
+                this._charter.b.clear();
+                this._charter.b.setOption(option, false);
+            }
         },
         getPw() {
             // 读取电量
@@ -315,6 +351,13 @@ Component({
         },
         async readExistsWave(waveId) {
             let wave = await wa.readWave(waveId);
+            // 如果正在播放就不用设置到播放列表了
+            if (!this._device.isRunning('a') && !this._device.isRunning('b')) {
+                //都没有播放的话 就设置到播放列表
+                let pLst = [wave];
+                // 设置播放列表
+                this._device.setPlayList('a', pLst);
+            }
             this.setData({
                 wave
             });
@@ -397,15 +440,12 @@ Component({
         },
         togglePlaying(e) {
             let isPlaying = this.data.isPlaying;
+            // 只播放A通道就可以了 如果是双通道的 会自动停止另一条通道的
             let msg1 = this._device.togglePlay('a');
             if (msg1) {
                 Toast.fail(msg1);
             }
-            let msg2 = this._device.togglePlay('b');
-            if (msg2) {
-                Toast.fail(msg2);
-                return;
-            }
+
             this.setData({
                 isPlaying: !isPlaying
             });

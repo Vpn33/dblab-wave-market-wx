@@ -2,9 +2,19 @@
 <wxs src="../../lib/tools.wxs" module="tools"></wxs>
 <view class="player-list">
     <view class="player-list-empty " wx:if="{{!playList || playList.length <= 0}}">
-        <van-cell class="play-cell" title="请添加波形" wx:if="{{type !== 'power'}}">
+        <van-cell class="play-cell" wx:if="{{type !== 'power'}}">
+            <view slot="title">
+                <view bindtap="toMyWaveList">
+                    <van-icon name="plus"></van-icon><text>请添加波形</text>
+                </view>
+            </view>
         </van-cell>
-        <van-cell class="play-cell" title="请添加电源方案" wx:if="{{type !== 'power'}}">
+        <van-cell class="play-cell" wx:if="{{type == 'power'}}">
+            <view slot="title">
+                <view bindtap="toMyPowerList">
+                    <van-icon name="plus"></van-icon><text>请添加电源方案</text>
+                </view>
+            </view>
         </van-cell>
     </view>
     <view class="player-list-item {{activeIdx !== null && activeIdx === sIdx?'playing':''}}" wx:for="{{playList || []}}" wx:for-index="sIdx" wx:key="sIdx" bindtap="clickItem">
@@ -21,11 +31,11 @@
                 </view>
             </view>
             <view class="play-cell-tools" data-idx="{{sIdx}}">
-                <van-icon class="play-cell-btn" name="back-top" catch:tap="toTop" data-idx="{{sIdx}}" wx:if="{{toolBtn.toTop}}"/>
-                <van-icon class="play-cell-btn" name="arrow-up" catch:tap="toUp" data-idx="{{sIdx}}" wx:if="{{toolBtn.toUp}}"/>
-                <van-icon class="play-cell-btn" name="arrow-down" catch:tap="toDown" data-idx="{{sIdx}}" wx:if="{{toolBtn.toDown}}"/>
-                <van-icon class="play-cell-btn" name="setting-o" catch:tap="toEditor" data-idx="{{sIdx}}" wx:if="{{toolBtn.toEditor}}"/>
-                <van-icon class="play-cell-btn" name="cross" catch:tap="toDelete" data-idx="{{sIdx}}" wx:if="{{toolBtn.toDelete}}"/>
+                <van-icon class="play-cell-btn" name="back-top" catch:tap="toTop" data-idx="{{sIdx}}" wx:if="{{toolBtn.toTop}}" />
+                <van-icon class="play-cell-btn" name="arrow-up" catch:tap="toUp" data-idx="{{sIdx}}" wx:if="{{toolBtn.toUp}}" />
+                <van-icon class="play-cell-btn" name="arrow-down" catch:tap="toDown" data-idx="{{sIdx}}" wx:if="{{toolBtn.toDown}}" />
+                <van-icon class="play-cell-btn" name="setting-o" catch:tap="toEditor" data-idx="{{sIdx}}" wx:if="{{toolBtn.toEditor}}" />
+                <van-icon class="play-cell-btn" name="cross" catch:tap="toDelete" data-idx="{{sIdx}}" wx:if="{{toolBtn.toDelete}}" />
             </view>
         </van-cell>
     </view>

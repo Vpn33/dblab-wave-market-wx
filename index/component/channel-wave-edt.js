@@ -309,7 +309,7 @@ Component({
             let idx = e.target.dataset['stageIdx'];
             let stages = this.properties.channelWave.stages[idx];
             stages.metas.push({
-                z: 31
+                z: 20
             });
             let data = {};
             data['channelWave.stages[' + idx + ']'] = stages;

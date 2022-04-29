@@ -145,7 +145,7 @@ Page({
         }
         // 删除电源方案文件的
         console.log("del power = ", power);
-        let res = await wa.deletePower(wave.id);
+        let res = await wa.deletePower(power.id);
         if (res) {
             // 删除显示列表
             powerList.splice(idx, 1);

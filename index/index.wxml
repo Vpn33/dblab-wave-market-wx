@@ -57,10 +57,10 @@
     <view>
       <van-tabs active="{{ activeNames }}" bind:change="onChange" z-index="0">
         <van-tab title="A通道" name="1">
-          <wave-player class="wave-player" channel="a"></wave-player>
+          <wave-player id="wave-player-1" class="wave-player" channel="a"></wave-player>
         </van-tab>
         <van-tab title="B通道" name="2">
-          <wave-player class="wave-player" channel="b"></wave-player>
+          <wave-player id="wave-player-2" class="wave-player" channel="b"></wave-player>
         </van-tab>
       </van-tabs>
     </view>
