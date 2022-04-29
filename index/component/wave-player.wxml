@@ -8,12 +8,9 @@
         </view>
         <view class="player-item-btns">
             <view class="player-item-btns-text">
-                <text class="player-text" bind:tap="showPlayTypePop">{{playTypeStr}}</text>
+                <text class="player-text" bind:tap="togglePlayType">{{playTypeStr}}</text>
             </view>
             <view>
-                <van-popup show="{{ showPlayType }}" position="bottom">
-                    <van-picker default-index="{{player.playType}}" show-toolbar title="播放类型" columns="{{ playTypeList }}" value-key="text" bind:confirm="onPlayTypeChange" bind:cancel="closePlayTypePop" />
-                </van-popup>
                 <van-icon class="btn-player-item" name="arrow-left" bindtap="prev" />
                 <van-button round type="primary" bindtap="togglePlay" class="btn-player" icon="play" data-channel="{{channel}}" wx:if="{{!playing}}"></van-button>
                 <van-button round type="primary" bindtap="togglePlay" class="btn-player" icon="stop" data-channel="{{channel}}" wx:if="{{playing}}"></van-button>

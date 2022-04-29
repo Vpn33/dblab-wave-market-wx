@@ -43,7 +43,6 @@ Component({
      */
     data: {
         showCharts: false, // 是否显示波形图像
-        showPlayType: false, //是否显示播放类型 0: 列表循环 1:列表顺序 2:列表随机 3:单曲循环
         playing: false, // 播放中
         playTypeStr: "",
         playTypeList: [{
@@ -385,25 +384,18 @@ Component({
                 message: '开启后，如果播放的波形是双通道的，另一通道被占用的情况下，将会自动停止另一通道的播放，从而播放当前双通道的波形。如果不开启，只会播放双通道中当前通道的波形',
             });
         },
-        showPlayTypePop() {
+        togglePlayType() {
+            let playType = this.data.player.playType || 0;
+            playType++;
+            if (playType > 3) {
+                playType = 0;
+            }
             this.setData({
-                showPlayType: true
-            });
-        },
-        closePlayTypePop() {
-            this.setData({
-                showPlayType: false
-            });
-        },
-        onPlayTypeChange(e) {
-            let val = e.detail.value.value;
-            this.setData({
-                'player.playType': val,
-                playTypeStr: e.detail.value.text,
-                showPlayType: false // 关闭弹出
+                'player.playType': playType,
+                'playTypeStr': this.data.playTypeList[playType].text
             });
             // 设置播放类型
-            this._device.setPlayType(this.data.channel, val);
+            this._device.setPlayType(this.data.channel, playType);
             // 保存播放器数据到缓存
             this.savePlayer();
         },
