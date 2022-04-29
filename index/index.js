@@ -1,20 +1,7 @@
 // index/wave.js
 import Dialog from '@vant/weapp/dialog/dialog';
-import tools from '../lib/tools';
 import Device from '../lib/device';
 
-function ab2hex(buffer) {
-  var hexArr = Array.prototype.map.call(new Uint8Array(buffer), function (bit) {
-    return ('00' + bit.toString(16)).slice(-2);
-  });
-  return hexArr.join('');
-}
-var pwServiceId = "955A180A-0FE2-F5AA-A094-84B8D4F3E8AD",
-  abServiceId = "955A180B-0FE2-F5AA-A094-84B8D4F3E8AD",
-  abPWChId = "955A1504-0FE2-F5AA-A094-84B8D4F3E8AD",
-  pwChId = "955A1500-0FE2-F5AA-A094-84B8D4F3E8AD",
-  aChId = "955A1505-0FE2-F5AA-A094-84B8D4F3E8AD",
-  bChId = "955A1506-0FE2-F5AA-A094-84B8D4F3E8AD";
 Page({
   // options: {
   //     styleIsolation: 'shared'

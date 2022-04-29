@@ -368,41 +368,6 @@ Component({
                 wave
             });
         },
-        // createWave() {
-        //     let that = this;
-        //     const fs = wx.getFileSystemManager();
-        //     let content = strToBinary(JSON.stringify(this.data.wave));
-        //     fs.writeFile({
-        //         filePath: `${wx.env.USER_DATA_PATH}/myWaves/` + this.data.wave.id + '.dlw',
-        //         data: content,
-        //         encoding: 'binary',
-        //         success(res) {
-        //             console.log(res)
-        //         },
-        //         fail(res) {
-        //             console.error(res)
-        //         }
-        //     })
-        // },
-        // readWave() {
-        //     let that = this;
-        //     wx.getFileSystemManager().readFile({
-        //         filePath: `${wx.env.USER_DATA_PATH}/myWaves/` + this.data.waveId + '.dlw',
-        //         success(res) {
-        //             let unit8Arr = new Uint8Array(res.data);
-        //             let encodedString = String.fromCharCode.apply(null, unit8Arr);
-        //             let s = binaryToStr(encodedString);
-        //             console.log(s)
-        //             let wave = JSON.parse(s);
-        //             that.setData({
-        //                 wave
-        //             });
-        //         },
-        //         fail(res) {
-        //             console.error(res)
-        //         }
-        //     });
-        // },
         onChange(e) {
             this.setData({
                 'wave.name': e.detail
@@ -412,6 +377,7 @@ Component({
             this.setData({
                 'wave.channelType': e.detail
             });
+            this.syncWaveToDevice();
         },
         onChartsInstance(e) {
             console.log(getApp());
@@ -446,8 +412,8 @@ Component({
         },
         togglePlaying(e) {
             let isPlaying = this.data.isPlaying;
-            // 只播放A通道就可以了 如果是双通道的 会自动停止另一条通道的
-            let msg1 = this._device.togglePlay('a');
+            let editChannel = this._device.getEditChannel() || 'a';
+            let msg1 = this._device.togglePlay(editChannel);
             if (msg1) {
                 Toast.fail(msg1);
             }
@@ -466,12 +432,30 @@ Component({
                 data['wave.' + cvl.channelName + '.stages'] = cvl.channelWave.stages;
             }
             this.setData(data);
+            this.syncWaveToDevice();
         },
-        async saveWave(e) {
+        syncWaveToDevice() {
+            // 同步波形数据到设备
             let wave = Object.assign({}, this.data.wave);
+            if (!this.checkWave(wave)) {
+                return;
+            }
+            // 获取编辑器进入的通道 如果没有就默认A通道
+            let editChannel = this._device.getEditChannel() || 'a';
+            // 编辑器模式直接清空列表 添加当前波形 默认A通道
+            let pLst = [wave];
+            // 设置播放列表
+            this._device.setPlayList(editChannel, pLst);
+            // 如果当前通道正在播放
+            if (this._device.isRunning(editChannel)) {
+                // 切换播放
+                this._device.changePlay(editChannel, 0);
+            }
+        },
+        checkWave(wave) {
             if (!wave.name) {
                 Toast.fail("波形名称不能为空");
-                return;
+                return false;
             }
             // 如果没有通道类型要设置一下
             if (!wave.channelType) {
@@ -486,7 +470,7 @@ Component({
             if (wave.channelType === '0') {
                 if (tools.isEmpty(wave.stages)) {
                     Toast.fail("至少添加一个小节");
-                    return;
+                    return false;
                 }
             }
             // id
@@ -509,24 +493,31 @@ Component({
                     st = st.concat(wave.a.stages || [], wave.b.stages || []);
                     if (tools.isEmpty(st)) {
                         Toast.fail("任意通道至少添加一个小节");
-                        return;
+                        return false;
                     }
                 } else if (wave.a) {
                     if (tools.isEmpty(wave.a.stages)) {
                         Toast.fail("A通道至少添加一个小节");
-                        return;
+                        return false;
                     }
                 } else if (wave.b) {
                     if (tools.isEmpty(wave.b.stages)) {
                         Toast.fail("B通道至少添加一个小节");
-                        return;
+                        return false;
                     }
                 } else {
                     Toast.fail("任意通道至少添加一个小节");
-                    return;
+                    return false;
                 }
             }
 
+            return true;
+        },
+        async saveWave(e) {
+            let wave = Object.assign({}, this.data.wave);
+            if (!this.checkWave(wave)) {
+                return;
+            }
             // 创建时间
             if (!wave.createTime) {
                 wave.createTime = moment().format("YYYY-MM-DD HH:mm:ss")

@@ -156,7 +156,7 @@ Component({
                         // 如果是编辑器模式就清空列表 添加当前波形
                         let pLst = [item];
                         // 设置编辑器模式
-                        that._device.setEditing(true);
+                        that._device.setEditing(true, that.data.channel);
                         // 设置播放列表
                         that._device.setPlayList(that.data.channel, pLst);
                         // 如果当前通道正在播放
