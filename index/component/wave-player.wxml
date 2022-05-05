@@ -4,7 +4,7 @@
 
     <view class="player-item">
         <view class="player-item play-wave-charts" wx:if="{{showCharts}}">
-            <ec-canvas id="mychart-dom-bar-{{channel}}" canvas-id="mychart-bar-{{channel}}" ec="{{ ecInstance }}" ></ec-canvas>
+            <ec-canvas id="mychart-dom-bar-{{channel}}" canvas-id="mychart-bar-{{channel}}" ec="{{ ecInstance }}"></ec-canvas>
         </view>
         <view class="player-item-btns">
             <view class="player-item-btns-text">
@@ -27,17 +27,17 @@
         <view class="player-item">电源强度 <a bindtap="showPwHelp">
                 <van-icon name="question" />
             </a><text>：{{player.pw}}</text></view>
-        <van-row gutter="10">
-            <van-col span="6">
+        <view class="play-item-line player-pw-set">
+            <view>
                 <van-button icon="minus" class="mini-btn" type="default" size="mini" bindtap="subAp" bindlongpress="subLongAp" bindtouchend="endSubLongAp"></van-button>
-            </van-col>
-            <van-col span="12">
+            </view>
+            <view class="pw-silder">
                 <van-slider class="player-pw-slider" binddrag="apChange" min="0" max="2047" value="{{player.pw}}" show-value />
-            </van-col>
-            <van-col span="6">
+            </view>
+            <view>
                 <van-button icon="plus" class="mini-btn" type="default" size="mini" bindtap="addAp" bindlongpress="addLongAp" bindtouchend="endLongAp"></van-button>
-            </van-col>
-        </van-row>
+            </view>
+        </view>
     </view>
     <view class="player-item">
         <view class="player-item">智能强度 <a bindtap="showAiPwHelp">
@@ -63,7 +63,7 @@
             </a></view>
         <view class="play-item-line">
             <van-radio-group value="{{ player.autoPwType }}" bind:change="onAutoPwTypeChange" direction="horizontal">
-                <van-radio name="0">往复</van-radio>
+                <van-radio name="0" custom-class="player-setting-items">往复</van-radio>
                 <van-radio name="1">顺序</van-radio>
                 <van-radio name="2">循环</van-radio>
                 <van-radio name="3">随机</van-radio>
@@ -142,7 +142,7 @@
         <play-list play-list="{{player.playList || []}}" active-idx="{{player.activeIdx}}" bind:clickItem="onPlayWaveClick" bind:change="onPlayListChange" before-tool-click="{{beforeEditor}}" data-beforeToolClick="{{beforeEditor}}"></play-list>
     </view>
     <van-popup show="{{ showChoosePower}}" bind:close="onCloseChoosePower" position="bottom">
-        <view class="pop-content h-scorller" >
+        <view class="pop-content h-scorller">
             <play-list wx:if="{{ showChoosePower}}" play-list="{{powerList|| []}}" active-idx="{{powerCaseIdx}}" type="power" bind:clickItem="onPowerCaseClick" bind:change="onPowerCaseChange" toolBtn="{{pwCaseBtns}}"></play-list>
         </view>
     </van-popup>

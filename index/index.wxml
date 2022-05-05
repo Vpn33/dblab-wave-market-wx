@@ -54,7 +54,7 @@
     <view class="">
       <text>电池电量：{{battery}} %</text>
     </view>
-    <view>
+    <view class="channel-tabs">
       <van-tabs active="{{ activeNames }}" bind:change="onChange" z-index="0">
         <van-tab title="A通道" name="1">
           <wave-player id="wave-player-1" class="wave-player" channel="a"></wave-player>

@@ -335,13 +335,13 @@ Component({
                 context: this,
                 message: '开启后会自动记录在播放某个波形时的电源强度(电源强度100以上生效)，下次播放时，如果电源强度大于记录的强度，就会自动减小到已记录的强度，当波形结束播放后，电源强度恢复。' +
                     '更智能的避免波形切换时带来的冲击感。(例如：A波-可承受电源130强度 B波-可承受电源100强度 如果按照APP的功能，从 A -> B 时因为强度没变，就会产生强烈的刺痛感，需要手动调节强度,' +
-                    '开启本功能后，就会主键避免这种问题，越使用就越精确)',
+                    '开启本功能后，就会逐渐避免这种问题，越使用就越精确)',
             });
         },
         showSyncPwHelp() {
             Dialog.alert({
                 context: this,
-                message: '开启后会A通道和B通道强度会同步改变',
+                message: '开启后会A通道和B通道强度会同步改变,两条通道会设置成相同的通道值。',
             });
         },
         showAutoPwHelp() {
@@ -360,6 +360,12 @@ Component({
             Dialog.alert({
                 context: this,
                 message: '开启自动强度后，会按照设定值进行周期性的改变。',
+            });
+        },
+        showAutoPwCaseHelp() {
+            Dialog.alert({
+                context: this,
+                message: '开启自动强度后，会按照自动强度间隔进行周期性的改变,改变值为方案中的设置值。如果方案未选择，则无效。',
             });
         },
         showMinHelp() {
@@ -769,6 +775,10 @@ Component({
             }
             // 设置播放索引和点击的索引一致
             this._device.setPlayingIdx(cha, this.data.player.activeIdx);
+            // 如果是从停止切换播放 要清空波形图像
+            if (!pl === true) {
+                this.clearCharts();
+            }
             let msg = this._device.togglePlay(cha);
             if (msg) {
                 Toast.fail(msg);

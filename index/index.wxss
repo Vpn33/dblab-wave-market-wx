@@ -72,3 +72,13 @@
 .flex-item {
   display: inline-block;
 }
+/* 
+.channel-tabs .van-tabs .van-sticky::after {
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  font: normal normal normal 14px/1 vant-icon;
+  content: "\e6af";
+  position: absolute;
+  top: 1rem;
+  left: calc(50% - 5px);
+} */

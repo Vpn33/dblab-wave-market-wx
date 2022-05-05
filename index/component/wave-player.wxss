@@ -201,3 +201,16 @@
     overflow-y: auto;
     margin-bottom: var(--tabbar-height, 50px);
 }
+
+.player-pw-set {
+    justify-content: space-between;
+}
+
+.player-pw-set .pw-silder{
+    flex-grow: 2;
+    padding: 0rem 1rem;
+}
+
+.player-pw-set .van-slider {
+    margin-top: 0.9rem;
+}
