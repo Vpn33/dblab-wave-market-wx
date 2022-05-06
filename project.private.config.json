@@ -52,15 +52,19 @@
                     "name": "",
                     "pathName": "index/my-power-list",
                     "query": "",
-                    "launchMode": "default",
                     "scene": null
                 },
                 {
                     "name": "",
                     "pathName": "index/component/power-editor",
                     "query": "",
-                    "scene": null,
-                    "launchMode": "default"
+                    "scene": null
+                },
+                {
+                    "name": "",
+                    "pathName": "index/my-home",
+                    "query": "",
+                    "scene": null
                 }
             ]
         }

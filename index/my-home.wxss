@@ -1,1 +1,64 @@
 /* index/my-home.wxss */
+.st-user-info {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.st-user-ava {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.st-user-ava text {
+    padding: 0.5rem;
+}
+
+.st-user-ava .userinfo-avatar {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 100%;
+}
+
+.st-line {
+    display: flex;
+}
+
+.st-line-btn {
+    justify-content: center;
+    padding: 1rem;
+}
+
+.st-title {
+    width: 40%;
+}
+
+.st-loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0.5rem;
+}
+
+.st-file-table {
+    width: 100%;
+    border-left: 1px solid;
+    border-right: 1px solid;
+}
+
+.st-file-table .st-line {
+    border-top: 1px solid;
+}
+
+.st-file-table .st-line text {
+    padding: 0.5rem;
+}
+
+.st-file-table .st-line:last-child {
+    border-bottom: 1px solid;
+}
+
+.st-file-table .st-line .st-title {
+    border-right: 1px solid;
+}

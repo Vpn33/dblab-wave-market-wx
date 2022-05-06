@@ -1,3 +1,67 @@
 <!--index/my-home.wxml-->
-<text>index/my-home.wxml</text>
-11111111111
+<wxs module="fn">
+    module.exports = {
+        rfs: function (number) {
+            if (number === null || number === undefined || number === NaN || number === 0) {
+                return '-';
+            }
+            if (number < 1024) {
+                return number + 'bytes';
+            } else if (number >= 1024 && number < 1048576) {
+                return (number / 1024).toFixed(1) + 'KB';
+            } else if (number >= 1048576) {
+                return (number / 1048576).toFixed(1) + 'MB';
+            }
+        }
+    }
+</wxs>
+<view class="container">
+    <view class="st-user-info">
+        <view class="st-user-ava" wx:if="{{!hasUserInfo}}">
+            <text>您还没有授权昵称和头像信息,请点击授权</text>
+            <van-button wx:if="{{canIUseGetUserProfile}}" bindtap="getUserProfile" type="default">获取头像昵称</van-button>
+        </view>
+        <view class="st-user-ava" wx:else>
+            <image class=" st-user-ava-img" bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover">
+            </image>
+            <text>{{userInfo.nickName}}</text>
+        </view>
+    </view>
+    <view class="st-file-table" load>
+        <view class="st-line">
+            <text class="st-title">存储目录</text><text>{{filePath}}</text>
+        </view>
+        <view class="st-line">
+            <text class="st-title">波形文件数据</text>
+            <view class="st-loading" wx:if="{{!loaded[0]}}">
+                <van-loading size="1rem" />
+            </view>
+            <text wx:else>{{fn.rfs(fileInfo.waveSize)}}</text>
+        </view>
+        <view class="st-line">
+            <text class="st-title">电源方案文件数据</text>
+            <view class="st-loading" wx:if="{{!loaded[1]}}">
+                <van-loading size="1rem" />
+            </view>
+            <text wx:else>{{fn.rfs(fileInfo.powSize)}}</text>
+        </view>
+        <view class="st-line">
+            <text class="st-title">播放器文件数据</text>
+            <view class="st-loading" wx:if="{{!loaded[2]}}">
+                <van-loading size="1rem" />
+            </view>
+            <text wx:else>{{fn.rfs(fileInfo.playerSize)}}</text>
+        </view>
+        <view class="st-line">
+            <text class="st-title">智能强度文件数据</text>
+            <view class="st-loading" wx:if="{{!loaded[3]}}">
+                <van-loading size="1rem" />
+            </view>
+            <text wx:else>{{fn.rfs(fileInfo.aiPwSize)}}</text>
+        </view>
+    </view>
+    <view class="st-line st-line-btn">
+        <van-button bindtap="cleanFile" type="default" block>清空文件存储</van-button>
+    </view>
+    <van-dialog id="van-dialog" />
+</view>

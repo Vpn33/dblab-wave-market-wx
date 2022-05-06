@@ -34,6 +34,7 @@ view {
     --radio-label-color: blanchedalmond;
     --radio-checked-icon-color: #F9E49C;
     --overlay-background-color: rgb(41 41 41 / 70%);
+    --dialog-has-title-message-text-color: blanchedalmond;
 }
 
 view .van-radio__icon--checked {
@@ -83,6 +84,7 @@ view.container {
     border-radius: 10px;
     background: #ededed;
 }
-.van-dialog__button button.van-button{
-    color: black!important;
+
+.van-dialog__button button.van-button {
+    color: black !important;
 }
