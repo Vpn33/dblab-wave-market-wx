@@ -94,18 +94,7 @@
 
 .channel-wave-btn {
     display: flex;
-}
-
-.channel-wave-btn .channel-wave {
-    flex: 1;
-}
-
-.channel-wave-btn .channel-wave:first-child {
-    padding-right: 0.5rem;
-}
-
-.channel-wave-btn .channel-wave:last-child {
-    padding-left: 0.5rem;
+    justify-content: space-between;
 }
 
 .pop-content {
@@ -117,4 +106,8 @@
 
 .play-cell-double-channel {
     font-weight: 1000;
+}
+
+.icon-import .van-icon-back-top:before {
+    transform: rotate(180deg);
 }

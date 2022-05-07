@@ -89,6 +89,8 @@ Page({
                         that.init();
                     }
                 })
+            }).catch(() => {
+                // on cancel
             });
     },
 

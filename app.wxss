@@ -18,6 +18,7 @@ view {
     --slider-button-height: 15px;
     --slider-active-background-color: #F9E49C;
     --dialog-background-color: #F9E49C;
+
     --switch-on-background-color: #F9E49C;
     --tab-text-color: blanchedalmond;
     --tab-active-text-color: blanchedalmond;
@@ -52,6 +53,7 @@ view .van-dialog__message {
 
 view .dialog-index--van-dialog {
     border: 1px #F9E49C solid;
+    background-color: #F9E49C;
 }
 
 view .van-tabs__nav {

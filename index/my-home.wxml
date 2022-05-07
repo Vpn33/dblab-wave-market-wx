@@ -3,7 +3,7 @@
     module.exports = {
         rfs: function (number) {
             if (number === null || number === undefined || number === NaN || number === 0) {
-                return '-';
+                return '';
             }
             if (number < 1024) {
                 return number + 'bytes';
@@ -36,28 +36,28 @@
             <view class="st-loading" wx:if="{{!loaded[0]}}">
                 <van-loading size="1rem" />
             </view>
-            <text wx:else>{{fn.rfs(fileInfo.waveSize)}}</text>
+            <text wx:else>{{fileInfo.waveCnt || 0}}个 {{fn.rfs(fileInfo.waveSize)}}</text>
         </view>
         <view class="st-line">
             <text class="st-title">电源方案文件数据</text>
             <view class="st-loading" wx:if="{{!loaded[1]}}">
                 <van-loading size="1rem" />
             </view>
-            <text wx:else>{{fn.rfs(fileInfo.powSize)}}</text>
+            <text wx:else>{{fileInfo.powCnt || 0}}个 {{fn.rfs(fileInfo.powSize)}}</text>
         </view>
         <view class="st-line">
             <text class="st-title">播放器文件数据</text>
             <view class="st-loading" wx:if="{{!loaded[2]}}">
                 <van-loading size="1rem" />
             </view>
-            <text wx:else>{{fn.rfs(fileInfo.playerSize)}}</text>
+            <text wx:else>{{fileInfo.playerCnt || 0}}个 {{fn.rfs(fileInfo.playerSize)}}</text>
         </view>
         <view class="st-line">
             <text class="st-title">智能强度文件数据</text>
             <view class="st-loading" wx:if="{{!loaded[3]}}">
                 <van-loading size="1rem" />
             </view>
-            <text wx:else>{{fn.rfs(fileInfo.aiPwSize)}}</text>
+            <text wx:else>{{fileInfo.aiPwCnt || 0}}个 {{fn.rfs(fileInfo.aiPwSize)}}</text>
         </view>
     </view>
     <view class="st-line st-line-btn">

@@ -7,7 +7,6 @@ import tools from '../../lib/tools';
 import moment from "moment";
 import '../../lib/lodash-init';
 import _ from "lodash";
-import Device from '../../lib/device';
 import * as echarts from '../../lib/echarts.min';
 
 function ecAInstance(canvas, width, height, dpr) {

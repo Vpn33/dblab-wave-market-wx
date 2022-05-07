@@ -10,7 +10,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-    isDebug: false, // 是否为测试模式
+    isDebug: true, // 是否为测试模式
     connState: '-1', // -1-未授权 0-未连接 1-已连接 2-连接中 2-连接失败
     connStateMsg: '', // 连接错误消息
     activeNames: '1', // 默认A通道显示
@@ -57,11 +57,12 @@ Page({
     let d = Device;
     getApp().blDevice = d;
     this._device = d;
-    // wx.getSystemInfo({
-    //   success(res) {
-    //     console.log(res)
-    //   }
-    // })
+
+    wx.getSystemInfo({
+      success(res) {
+        getApp().systenInfo = res;
+      }
+    })
   },
   onShow: function () {
     // 页面出现在前台时执行

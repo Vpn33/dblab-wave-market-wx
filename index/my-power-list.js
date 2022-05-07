@@ -1,7 +1,8 @@
 // index/my-power-list.js
 import wa from "../lib/wave-analyzer";
 import Toast from '@vant/weapp/toast/toast';
-import tools from '../lib/tools';
+import Dialog from '@vant/weapp/dialog/dialog';
+import consts from "../lib/consts";
 import '../lib/lodash-init';
 import _ from "lodash";
 Page({
@@ -143,18 +144,27 @@ Page({
         if (!power.id) {
             return;
         }
-        // 删除电源方案文件的
-        console.log("del power = ", power);
-        let res = await wa.deletePower(power.id);
-        if (res) {
-            // 删除显示列表
-            powerList.splice(idx, 1);
-            this.setData({
-                powerList
+        Dialog.confirm({
+                title: '-警告-',
+                message: '是否删除电源方案【' + power.name + '】？\n(删除的数据不可找回)',
             })
-        } else {
-            Toast.fail("删除失败");
-        }
+            .then(async () => {
+
+                // 删除电源方案文件的
+                console.log("del power = ", power);
+                let res = await wa.deletePower(power.id);
+                if (res) {
+                    // 删除显示列表
+                    powerList.splice(idx, 1);
+                    this.setData({
+                        powerList
+                    })
+                } else {
+                    Toast.fail("删除失败");
+                }
+            }).catch(() => {
+                // on cancel
+            });
     },
     addPower() {
         wx.navigateTo({
@@ -169,8 +179,27 @@ Page({
         // 写入文件
         wa.writePlayerPow(cha, powInf);
         Toast.success({
-            message: '电源方案【'+ pow.name + '】已应用到' + cha.toUpperCase() + '通道'
+            message: '电源方案【' + pow.name + '】已应用到' + cha.toUpperCase() + '通道'
         });
+    },
+    toShare(e) {
+        let idx = e.target.dataset['idx'];
+        let pow = this.data.powerList[idx];
+        if (!pow.id) {
+            return;
+        }
+        // 如果是模拟器 就不用继续了
+        if ('devtools' === getApp().systenInfo.platform) {
+            Toast.fail("您的设备不支持分享");
+            return;
+        }
+
+        let powPath = consts.POW_PATH + pow.id + '.dlp';
+        console.log("share file = ", powPath)
+        wx.shareFileMessage({
+            filePath: powPath,
+            fileName: pow.id + '-' + pow.name + '.dlp'
+        })
     }
 
 })

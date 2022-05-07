@@ -34,6 +34,7 @@
 </wxs>
 <view class="container">
     <van-toast id="van-toast" />
+    <van-dialog id="van-dialog" />
     <view class="page-body">
         <view class="play-tools">
             <van-dropdown-menu active-color="#F9E49C">
@@ -90,6 +91,7 @@
                         <text class="play-cell-btn" bind:tap="setChannel" data-channel="a" data-idx="{{sIdx}}">=A</text>
                         <text class="play-cell-btn" bind:tap="setChannel" data-channel="b" data-idx="{{sIdx}}">=B</text>
                         <van-icon class="play-cell-btn" name="setting-o" bind:tap="toEditor" data-idx="{{sIdx}}" />
+                        <van-icon class="play-cell-btn" name="share" bind:tap="toShare" data-idx="{{sIdx}}" />
                         <van-icon class="play-cell-btn" name="delete" bind:tap="toDelete" data-idx="{{sIdx}}" />
                         <van-icon class="play-cell-btn" wx:if="{{fn.isOpen(powerListOpen[sIdx])}}" name="arrow-up" bind:tap="toggleOpenCell" data-idx="{{sIdx}}" />
                         <van-icon class="play-cell-btn" wx:if="{{!fn.isOpen(powerListOpen[sIdx])}}" name="arrow-down" bind:tap="toggleOpenCell" data-idx="{{sIdx}}" />
