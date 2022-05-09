@@ -200,6 +200,9 @@ Component({
                 if (_.isArray(hz)) {
                     data['channelWave.stages[' + idx + '].hz'] = hz;
                 } else {
+                    if (hz <= 1) {
+                        hz = 10;
+                    }
                     data['channelWave.stages[' + idx + '].hz'] = [1, hz];
                 }
             }
@@ -272,7 +275,7 @@ Component({
             let idx = e.target.dataset['stageIdx'];
             let hz = this.properties.channelWave.stages[idx].hz;
             let ap = hz - 1;
-            if (ap < 10) ap = 10;
+            if (ap < 1) ap = 1;
             let data = {};
             data['channelWave.stages[' + idx + '].hz'] = ap;
             this.setData(
