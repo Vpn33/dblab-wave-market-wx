@@ -211,7 +211,11 @@ Page({
     let sr = await this._device.startDiscovery();
     if (sr === true) {
       let cs = await this._device.getConnection();
+      // 连接成功
       if (cs === true) {
+        // 只要连接就先把电源强度设置成0 避免上次直接关闭页面 不能重置强度的问题
+        this._device.setPw('a', 0);
+        this._device.setPw('b', 0);
         // 改变蓝牙状态为正在连接
         this.setData({
           'connState': '1'

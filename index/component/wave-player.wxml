@@ -43,7 +43,12 @@
         <view class="player-item">智能强度 <a bindtap="showAiPwHelp">
                 <van-icon name="question" />
             </a></view>
-        <van-switch name="aiPw" checked="{{ player.aiPw }}" size="1rem" bind:change="onAiPwChange" />
+        <view class="play-item-line">
+            <van-switch class="play-item-line-elem inv-stepper-switch" name="aiPw" checked="{{ player.aiPw }}" size="1rem" bind:change="onAiPwChange" />
+            <van-button class="play-item-line-elem" type="primary" size="small" bindtap="recAiPw">手动记录</van-button>
+            <van-button class="play-item-line-elem" type="primary" size="small" bindtap="cleAiPw">清空记录</van-button>
+            <van-button type="primary" size="small" bindtap="delAiPw">删除波形记录</van-button>
+        </view>
     </view>
     <view class="player-item">
         <view class="player-item">同步强度 <a bindtap="showSyncPwHelp">
