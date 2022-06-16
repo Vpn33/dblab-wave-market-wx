@@ -1,4 +1,5 @@
 // index/component/power-editor.js
+import Dialog from '@vant/weapp/dialog/dialog';
 import Toast from '@vant/weapp/toast/toast';
 import moment from "moment";
 import tools from '../../lib/tools';
@@ -91,6 +92,12 @@ Component({
                 data
             );
             // console.log(this.data.wave.stages[idx].metas[mIdx]);
+        },
+        showAutoPwHelp() {
+            Dialog.alert({
+                context: this,
+                message: '开启后通道电源强度会按照设定值周期性的改变(波形数据中设置电源增量会失效)',
+            });
         },
         async savePower() {
             // 保存电源方案

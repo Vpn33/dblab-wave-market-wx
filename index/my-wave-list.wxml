@@ -1,4 +1,5 @@
 <!--index/my-wave-list.wxml-->
+<wxs src="../lib/tools.wxs" module="tools"></wxs>
 <wxs module="fn">
     module.exports = {
         isOpen: function (arr) {
@@ -28,7 +29,7 @@
             }
             console.log(res);
             return res;
-        }
+        },
 
     }
 </wxs>
@@ -38,8 +39,8 @@
     <view class="page-body">
         <view class="play-tools">
             <van-dropdown-menu active-color="#F9E49C">
-                <van-dropdown-item value="{{ sortCol }}" options="{{ sortColOpt }}" />
-                <van-dropdown-item value="{{ sortType }}" options="{{ sortTypeOpt }}" />
+                <van-dropdown-item value="{{ sortCol }}" options="{{ sortColOpt }}" bind:change="onSearchChange" data-stype="sortCol" />
+                <van-dropdown-item value="{{ sortType }}" options="{{ sortTypeOpt }}" bind:change="onSearchChange" data-stype="sortType" />
             </van-dropdown-menu>
         </view>
         <view class="add-wave channel-wave-btn">
@@ -73,16 +74,20 @@
                         <view class="play-cell-label" slot="label">
                             <view class="play-cell-label-cont" wx:if="{{fn.isOpen(waveListOpen[sIdx])}}">
                                 <view class="play-cell-label-cont-line">
+                                    <text>已播放次数: {{item.playCnt || 0}}</text>
+                                    <text>已播放时长: {{ tools.getTotalTime(item.playTolTime) }}</text>
+                                </view>
+                                <view class="play-cell-label-cont-line">
                                     <text>作者: {{ item.author || '匿名'}}</text>
                                     <text>时长: {{ item.totalTime || '-'}}</text>
                                 </view>
                                 <view class="play-cell-label-cont-line">
                                     <text>通道类型: {{ fn.getChannelType(item)}}</text>
                                     <view class="play-cell-title-cont">
-                                        <text>难度:</text>
-                                        <van-rate value=" {{ item.lv || '1'}}" readonly allow-half size="14px" gutter="2px" void-icon="star" color="#F9E49C" void-color="#eee" count="5" />
+                                        <text>难度:</text>                                        
+                                        <van-rate value=" {{ item.lv || '0'}}" readonly allow-half size="14px" gutter="2px" void-icon="star" color="#F9E49C" void-color="#eee" count="5" />
                                     </view>
-                                    <text>综合得分: {{ item.tolScore || '0.0'}}</text>
+                                    <text>综合得分: {{ item.tolScore || '-'}}</text>
                                 </view>
                                 <view class="play-cell-label-cont-line" wx:if="{{item.createTime}}">
                                     <text wx:if="{{item.createTime}}">创建时间: {{item.createTime}}</text>

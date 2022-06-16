@@ -46,6 +46,14 @@ Page({
             {
                 text: '按难度',
                 value: 'lv'
+            },
+            {
+                text: '按已播放次数',
+                value: 'playCnt'
+            },
+            {
+                text: '按已播放时长',
+                value: 'playTolTime'
             }
         ],
         sortType: 0, // 排序类型 0-倒序 1-正序
@@ -145,6 +153,28 @@ Page({
     onShareAppMessage: function () {
 
     },
+    searchWaveList() {
+        let that = this;
+        (async () => {
+            let waveList = await wa.readWaveList(this.data.sortCol, this.data.sortType);
+            console.log("waveList=", waveList);
+            if (waveList) {
+                that.setData({
+                    'waveLoading': false,
+                    'waveList': waveList
+                });
+            }
+        })();
+    },
+    onSearchChange: function(e){
+        let stype = e.target.dataset['stype'];
+        let data = {};
+        data[stype] = e.detail;
+        this.setData(data);
+        
+        // 读取波形列表
+        this.searchWaveList();
+    },
     init: function () {
         let that = this;
         this.setData({
@@ -155,17 +185,7 @@ Page({
         // 初始化标签栏
         this.getTabBar().init();
         // 读取波形列表
-        (async () => {
-            let waveList = await wa.readWaveList(this.data.sortCol, this.data.sortType);
-            console.log("waveList=", waveList);
-            if (waveList) {
-                that.setData({
-                    'waveLoading': false,
-                    'waveList': waveList
-                });
-            }
-            //console.log("waveList=", waveList);
-        })();
+        this.searchWaveList();
         // 读取播放列表
         (async () => {
             const playList = await wa.readPlayList('a');
@@ -180,7 +200,7 @@ Page({
         (async () => {
             const playList = await wa.readPlayList('b');
             console.log("bPlayList=", playList);
-            if (playList && (playList.a || playList.b)) {
+            if (playList) {
                 that.setData({
                     'bLstLoading': false,
                     'playList.b': playList

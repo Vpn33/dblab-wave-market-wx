@@ -19,13 +19,16 @@
     padding: 5px;
     margin: 5px 0px;
     min-width: 20rem;
-    min-height: 10rem;
-    margin-right: 5px;
+    height: 30rem;
+}
+
+.power-stage .player-item {
+    height: 100%;
 }
 
 .player-item .metas {
     width: 90%;
-    height: 10rem;
+    height: 92%;
     overflow-x: auto;
     overflow-y: hidden;
     padding: 0 1rem 1rem 0.5rem;
@@ -41,16 +44,12 @@
 }
 
 .player-item .meta-item .meta-item-del {
-    height: 20%;
+    height: 8%;
     text-align: center;
 }
 
 .player-item .meta-item .meta-item-slider {
-    height: 80%;
-}
-
-.player-item .meta-item .meta-item-slider {
-    height: 80%;
+    height: 92%;
 }
 
 .player-item .meta-item .van-slider {

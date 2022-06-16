@@ -46,8 +46,8 @@
         <view class="play-item-line">
             <van-switch class="play-item-line-elem inv-stepper-switch" name="aiPw" checked="{{ player.aiPw }}" size="1rem" bind:change="onAiPwChange" />
             <van-button class="play-item-line-elem" type="primary" size="small" bindtap="recAiPw">手动记录</van-button>
-            <van-button class="play-item-line-elem" type="primary" size="small" bindtap="cleAiPw">清空记录</van-button>
-            <van-button type="primary" size="small" bindtap="delAiPw">删除波形记录</van-button>
+            <van-button class="play-item-line-elem" type="primary" size="small" bindtap="delAiPw">删除波形记录</van-button>
+            <van-button  type="primary" size="small" bindtap="cleAiPw">清空记录</van-button>
         </view>
     </view>
     <view class="player-item">

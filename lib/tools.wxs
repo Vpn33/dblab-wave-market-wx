@@ -1,4 +1,4 @@
-module.exports = {
+var tools = {
     stringify: function (arr) {
         if (arr) {
             return JSON.stringify(arr);
@@ -29,4 +29,34 @@ module.exports = {
             return res;
         }
     },
-}
+    getTotalTime: function (item) {
+        if (!item || item <= 0) {
+            return '00:00';
+        }
+        var time = item;
+        // 60 * 60
+        var hour = parseInt(time / 3600);
+        var minute = parseInt((time - hour * 3600) / 60);
+        var second = parseInt(time - hour * 3600 - minute * 60);
+
+        var res = '';
+        if (hour > 0) {
+            res += tools.fixZeroStart(hour, 2) + ':';
+        }
+        if (minute >= 0) {
+            res += tools.fixZeroStart(minute, 2) + ':';
+        }
+        if (second >= 0) {
+            res += tools.fixZeroStart(second, 2);
+        }
+        return res;
+    },
+    fixZeroStart: function (str, n) {
+        var ar = [];
+        for (var i = 0; i < n; i++) {
+            ar[i] = '';
+        }
+        return (ar.join(0) + str).slice(-n);
+    }
+};
+module.exports = tools;
