@@ -29,8 +29,7 @@
             }
             console.log(res);
             return res;
-        },
-
+        }
     }
 </wxs>
 <view class="container">
@@ -79,7 +78,7 @@
                                 </view>
                                 <view class="play-cell-label-cont-line">
                                     <text>作者: {{ item.author || '匿名'}}</text>
-                                    <text>时长: {{ item.totalTime || '-'}}</text>
+                                    <text>时长: {{ tools.getWaveTime(item) || '-'}}</text>
                                 </view>
                                 <view class="play-cell-label-cont-line">
                                     <text>通道类型: {{ fn.getChannelType(item)}}</text>
@@ -120,13 +119,13 @@
     <van-popup show="{{ showPlayList.a}}" bind:close="onClosePlayList" position="bottom">
         <view class="pop-content  h-scorller">
             <van-loading wx:if="{{aLstLoading}}" />
-            <play-list wx:else play-list="{{playList.a || []}}" bind:change="onPlayListChange" data-channel="a"></play-list>
+            <play-list wx:else play-list="{{playList.a || []}}" bind:change="onPlayListChange" data-channel="a" bind:beforeClose="hidePlayLst"></play-list>
         </view>
     </van-popup>
     <van-popup show="{{ showPlayList.b}}" bind:close="onClosePlayList" position="bottom">
         <view class="pop-content  h-scorller">
             <van-loading wx:if="{{bLstLoading}}" />
-            <play-list wx:else play-list="{{playList.b || []}}" bind:change="onPlayListChange" data-channel="b"></play-list>
+            <play-list wx:else play-list="{{playList.b || []}}" bind:change="onPlayListChange" data-channel="b" bind:beforeClose="hidePlayLst"></play-list>
         </view>
     </van-popup>
 </view>

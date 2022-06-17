@@ -57,7 +57,6 @@ Page({
     let d = Device;
     getApp().blDevice = d;
     this._device = d;
-
     wx.getSystemInfo({
       success(res) {
         getApp().systenInfo = res;

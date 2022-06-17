@@ -166,12 +166,12 @@ Page({
             }
         })();
     },
-    onSearchChange: function(e){
+    onSearchChange: function (e) {
         let stype = e.target.dataset['stype'];
         let data = {};
         data[stype] = e.detail;
         this.setData(data);
-        
+
         // 读取波形列表
         this.searchWaveList();
     },
@@ -188,24 +188,20 @@ Page({
         this.searchWaveList();
         // 读取播放列表
         (async () => {
-            const playList = await wa.readPlayList('a');
+            let playList = await wa.readPlayList('a');
             console.log("aPlayList=", playList);
-            if (playList) {
-                that.setData({
-                    'aLstLoading': false,
-                    'playList.a': playList
-                })
-            }
+            that.setData({
+                'aLstLoading': false,
+                'playList.a': playList
+            });
         })();
         (async () => {
-            const playList = await wa.readPlayList('b');
+            let playList = await wa.readPlayList('b');
             console.log("bPlayList=", playList);
-            if (playList) {
-                that.setData({
-                    'bLstLoading': false,
-                    'playList.b': playList
-                })
-            }
+            that.setData({
+                'bLstLoading': false,
+                'playList.b': playList
+            });
         })();
     },
     async test() {
@@ -355,8 +351,8 @@ Page({
                 let existsWave = false;
                 let checked = false;
                 // 如果本地有波形文件 要对比id
-                while(that.data.waveLoading && checked ===false){
-                    if(that.data.waveLoading === true){
+                while (that.data.waveLoading && checked === false) {
+                    if (that.data.waveLoading === true) {
                         let idSet = {};
                         that.data.waveList.forEach(w => {
                             idSet[w.id] = w;
@@ -481,6 +477,13 @@ Page({
             filePath: wavePath,
             fileName: wave.id + '-' + wave.name + '.dlw'
         })
+    },
+    hidePlayLst(e) {
+        // 隐藏列表
+        let cha = e.target.dataset['channel'];
+        let data = {};
+        data['showPlayList.' + cha] = false;
+        this.setData(data);
     }
 
 })

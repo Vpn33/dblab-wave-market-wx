@@ -19,7 +19,7 @@ var tools = {
     },
     arrExists: function (arr, elem) {
         if (arr && arr.length > 0) {
-            let res = false;
+            var res = false;
             arr.find(function (v, i) {
                 if (v === elem) {
                     res = true;
@@ -34,9 +34,13 @@ var tools = {
             return '00:00';
         }
         var time = item;
+        if (time <= 1) {
+            return time + ' 秒';
+        }
         // 60 * 60
         var hour = parseInt(time / 3600);
         var minute = parseInt((time - hour * 3600) / 60);
+        var second = parseInt(time - hour * 3600 - minute * 60);
         var second = parseInt(time - hour * 3600 - minute * 60);
 
         var res = '';
@@ -57,6 +61,51 @@ var tools = {
             ar[i] = '';
         }
         return (ar.join(0) + str).slice(-n);
+    },
+    sumBy: function (arr, func) {
+        var res = 0;
+        if (!arr || !func) {
+            return res;
+        }
+        for (var i = 0; i < arr.length; i++) {
+            var e = arr[i];
+            res += (func(e) || 0);
+        }
+        return res;
+    },
+    getWaveTime: function (wave) {
+        if (!wave) {
+            return '-';
+        }
+        if (wave.totalTime) {
+            return tools.getTotalTime(wave.totalTime);
+        }
+        var toltalTime = 0;
+        // 如果是单通道
+        if (wave.channelType === '0') {
+            toltalTime = tools.sumBy(wave.stages, function (s) {
+                return s.metas.length;
+            }) * 100;
+        } else {
+            if (wave.a && wave.b) {
+                // 总时长 = 小节内原数量*100
+                totalTime += tools.sumBy(wave.a.stages, function (s) {
+                    return s.metas.length;
+                }) * 100;
+                totalTime += tools.sumBy(wave.b.stages, function (s) {
+                    return s.metas.length;
+                }) * 100;
+            } else if (wave.a) {
+                totalTime += tools.sumBy(wave.a.stages, function (s) {
+                    return s.metas.length;
+                }) * 100;
+            } else if (wave.b) {
+                totalTime += tools.sumBy(wave.b.stages, function (s) {
+                    return s.metas.length;
+                }) * 100;
+            }
+        }
+        return tools.getTotalTime(toltalTime / 1000);
     }
 };
 module.exports = tools;

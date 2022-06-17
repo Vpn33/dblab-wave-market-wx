@@ -206,11 +206,15 @@
     justify-content: space-between;
 }
 
-.player-pw-set .pw-silder{
+.player-pw-set .pw-silder {
     flex-grow: 2;
     padding: 0rem 1rem;
 }
 
 .player-pw-set .van-slider {
     margin-top: 0.9rem;
+}
+
+.pw-btn button{
+    font-size: 1rem;
 }

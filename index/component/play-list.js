@@ -62,8 +62,8 @@ Component({
     data: {
 
     },
-    pageLifetimes: {
-        show: function () {
+    lifetimes: {
+        ready: function () {
             let toolBtn = Object.assign({
                 toTop: true,
                 toUp: true,
@@ -74,6 +74,11 @@ Component({
             this.setData({
                 toolBtn
             });
+        }
+    },
+    pageLifetimes: {
+        show: function () {
+
         },
         hide: function () {
 
@@ -149,6 +154,10 @@ Component({
             this.triggerEvent('change', list);
         },
         toMyWaveList: function () {
+            if (getCurrentPages()[0].route.endsWith('my-wave-list')) {
+                this.triggerEvent('beforeClose', this);
+                return;
+            }
             wx.switchTab({
                 url: 'my-wave-list'
             });

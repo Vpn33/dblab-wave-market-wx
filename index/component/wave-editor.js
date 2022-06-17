@@ -456,6 +456,7 @@ Component({
                 Toast.fail("波形名称不能为空");
                 return false;
             }
+            let totalTime = 0;
             // 如果没有通道类型要设置一下
             if (!wave.channelType) {
                 if (wave.a && wave.b) {
@@ -471,6 +472,9 @@ Component({
                     Toast.fail("至少添加一个小节");
                     return false;
                 }
+
+                // 总时长 = 小节内原数量*100
+                totalTime = _.sumBy(wave.stages, (s) => s.metas.length) * 100;
             }
             // id
             if (!wave.id) {
@@ -494,21 +498,27 @@ Component({
                         Toast.fail("任意通道至少添加一个小节");
                         return false;
                     }
+                    // 总时长 = 小节内原数量*100
+                    totalTime += _.sumBy(wave.a.stages, (s) => s.metas.length) * 100;
+                    totalTime += _.sumBy(wave.b.stages, (s) => s.metas.length) * 100;
                 } else if (wave.a) {
                     if (tools.isEmpty(wave.a.stages)) {
                         Toast.fail("A通道至少添加一个小节");
                         return false;
                     }
+                    totalTime += _.sumBy(wave.a.stages, (s) => s.metas.length) * 100;
                 } else if (wave.b) {
                     if (tools.isEmpty(wave.b.stages)) {
                         Toast.fail("B通道至少添加一个小节");
                         return false;
                     }
+                    totalTime += _.sumBy(wave.b.stages, (s) => s.metas.length) * 100;
                 } else {
                     Toast.fail("任意通道至少添加一个小节");
                     return false;
                 }
             }
+            wave.totalTime = totalTime;
 
             return true;
         },

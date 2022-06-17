@@ -106,25 +106,25 @@ Component({
         ready: function () {
             // 二进制转xyz
             let data = ["000000000000010111100011",
-            "000001101000010111100011",
-            "000010100000010111100011",
-            "000000111000010111100011",
-            "000010100000010111100011",
-            "000000000000010111100011",
-            "000010100000010111100011",
-            "000000101000010111100011",
-            "000010100000010111100011",
-            "000000000000010111100011",
-            "000010100000010111100011",
-            "000001001000010111100011",
-            "000010100000010111100011",
-            "000001110000010111100011",
-            "000010100000010111100011"
+                "000001101000010111100011",
+                "000010100000010111100011",
+                "000000111000010111100011",
+                "000010100000010111100011",
+                "000000000000010111100011",
+                "000010100000010111100011",
+                "000000101000010111100011",
+                "000010100000010111100011",
+                "000000000000010111100011",
+                "000010100000010111100011",
+                "000001001000010111100011",
+                "000010100000010111100011",
+                "000001110000010111100011",
+                "000010100000010111100011"
             ];
             let waveData = wa.binary2WaveData(data);
             console.log("waveData = ", JSON.stringify(waveData, null, 2));
 
-           
+
             let rarr = new ArrayBuffer(3);
             let dataView = new DataView(rarr);
             dataView.setUint8(0, parseInt('43', 16));
@@ -579,24 +579,26 @@ Component({
         //     this.pwChartsData = _.takeRight(this.pwChartsData, 300);
         //     this.setCharts(this.waveChartsData, this.pwChartsData);
         // },
-        subAp() {
-            this._device.addPw(this.data.channel, -1);
+        subAp(e) {
+            let adval = e.target.dataset['adval'] || -1;
+            this._device.addPw(this.data.channel, parseInt(adval));
         },
-        subLongAp() {
+        subLongAp(e) {
             this.subLongApInv = setInterval(() => {
-                this.subAp();
+                this.subAp(e);
             }, 100);
         },
         endSubLongAp() {
             clearInterval(this.subLongApInv);
             this.subLongApInv = null;
         },
-        addAp() {
-            this._device.addPw(this.data.channel, 1);
+        addAp(e) {
+            let adval = e.target.dataset['adval'] || 1;
+            this._device.addPw(this.data.channel, parseInt(adval));
         },
-        addLongAp() {
+        addLongAp(e) {
             this.addLongApInv = setInterval(() => {
-                this.addAp();
+                this.addAp(e);
             }, 100);
         },
         endLongAp() {
@@ -776,6 +778,17 @@ Component({
             this.setData(data);
             // 写入文件
             wa.writePlayList(this.data.channel, this.data.playList);
+            let cha = this.data.channel;
+            // 如果正在播放 需要重新计算索引
+            if (this._device.isRunning(cha)) {
+                let pi = this._device.getPlayingInfo(cha);
+                let playIdx = _.findIndex(this.data.playList, {
+                    'id': pi.waveId
+                });
+                let data = {};
+                data['player.activeIdx'] = playIdx;
+                this.setData(data);
+            }
         },
         onPowerCaseChange(e) {
             // 电源方案修改要存储
@@ -787,9 +800,9 @@ Component({
             let idx = tar.index;
             // 如果正在播放
             if (this._device.isRunning(cha)) {
-                let nDx = this._device.getPlayingIdx(cha);
+                let playingInfo = this._device.getPlayingInfo(cha);
                 // 点击的波形和当前播放的不一样再切换
-                if (idx != nDx) {
+                if (playingInfo.waveId != tar.data.id) {
                     // 切换波形
                     let msg = this._device.changePlay(cha, idx);
                     if (msg) {
@@ -813,7 +826,7 @@ Component({
                         'player.autoPwCase': this.data.powerList[this.data.powerCaseIdx], // 同时刷新一下缓存中的电源方案 避免修改后依然读取缓存的
                     });
                 } else if (this.data.powerList.length <= 0) {
-                    // 如果电源列表为 说明一个方案都没有 要清除方案
+                    // 如果电源列表为空 说明一个方案都没有 要清除方案
                     this.setData({
                         'player.autoPwCase': null,
                         'powerCaseIdx': -1

@@ -29,13 +29,25 @@
             </a><text>：{{player.pw}}</text></view>
         <view class="play-item-line player-pw-set">
             <view>
-                <van-button icon="minus" class="mini-btn" type="default" size="mini" bindtap="subAp" bindlongpress="subLongAp" bindtouchend="endSubLongAp"></van-button>
-            </view>
-            <view class="pw-silder">
-                <van-slider class="player-pw-slider" binddrag="apChange" min="0" max="2047" value="{{player.pw}}" show-value />
+                <van-button class="mini-btn pw-btn" type="default" size="mini" bindtap="subAp" data-adval="-10">-10</van-button>
             </view>
             <view>
-                <van-button icon="plus" class="mini-btn" type="default" size="mini" bindtap="addAp" bindlongpress="addLongAp" bindtouchend="endLongAp"></van-button>
+                <van-button class="mini-btn pw-btn" type="default" size="mini" bindtap="subAp" data-adval="-5">-5</van-button>
+            </view>
+            <view>
+                <van-button class="mini-btn  pw-btn" type="default" size="mini" bindtap="subAp" bindlongpress="subLongAp" bindtouchend="endSubLongAp">-1</van-button>
+            </view>
+            <view>
+                <van-button class="mini-btn  pw-btn" type="default" size="mini" bindtap="setPwZero" >0</van-button>
+            </view>
+            <view>
+                <van-button class="mini-btn  pw-btn" type="default" size="mini" bindtap="addAp" bindlongpress="addLongAp" bindtouchend="endLongAp">+1</van-button>
+            </view>
+            <view>
+                <van-button class="mini-btn  pw-btn" type="default" size="mini" bindtap="addAp" data-adval="5">+5</van-button>
+            </view>
+            <view>
+                <van-button class="mini-btn  pw-btn" type="default" size="mini" bindtap="addAp" data-adval="10">+10</van-button>
             </view>
         </view>
     </view>
@@ -47,7 +59,7 @@
             <van-switch class="play-item-line-elem inv-stepper-switch" name="aiPw" checked="{{ player.aiPw }}" size="1rem" bind:change="onAiPwChange" />
             <van-button class="play-item-line-elem" type="primary" size="small" bindtap="recAiPw">手动记录</van-button>
             <van-button class="play-item-line-elem" type="primary" size="small" bindtap="delAiPw">删除波形记录</van-button>
-            <van-button  type="primary" size="small" bindtap="cleAiPw">清空记录</van-button>
+            <van-button type="primary" size="small" bindtap="cleAiPw">清空记录</van-button>
         </view>
     </view>
     <view class="player-item">

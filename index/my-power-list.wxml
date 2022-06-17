@@ -1,4 +1,5 @@
 <!--index/my-power-list.wxml-->
+<wxs src="../lib/tools.wxs" module="tools"></wxs>
 <wxs module="fn">
     module.exports = {
         isOpen: function (arr) {
@@ -29,7 +30,6 @@
             console.log(res);
             return res;
         }
-
     }
 </wxs>
 <view class="container">
@@ -63,15 +63,14 @@
                         <view class="play-cell-label-cont" wx:if="{{fn.isOpen(powerListOpen[sIdx])}}">
                             <view class="play-cell-label-cont-line">
                                 <text>作者: {{ item.author || '匿名'}}</text>
-                                <text>时长: {{ item.totalTime || '-'}}</text>
+                                <text>节点个数: {{ item.metas.length || '1'}}</text>
                             </view>
                             <view class="play-cell-label-cont-line">
-                                <text>通道类型: {{ fn.getChannelType(item)}}</text>
                                 <view class="play-cell-title-cont">
                                     <text>难度:</text>
-                                    <van-rate value=" {{ item.lv || '1'}}" readonly allow-half size="14px" gutter="2px" void-icon="star" color="#F9E49C" void-color="#eee" count="5" />
+                                    <van-rate value=" {{ item.lv || '0'}}" readonly allow-half size="14px" gutter="2px" void-icon="star" color="#F9E49C" void-color="#eee" count="5" />
                                 </view>
-                                <text>综合得分: {{ item.tolScore || '0.0'}}</text>
+                                <text>综合得分: {{ item.tolScore || '-'}}</text>
                             </view>
                             <view class="play-cell-label-cont-line" wx:if="{{item.createTime}}">
                                 <text wx:if="{{item.createTime}}">创建时间: {{item.createTime}}</text>
